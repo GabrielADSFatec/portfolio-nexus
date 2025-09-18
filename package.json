@@ -10,9 +10,11 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@next/font": "^14.2.15",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.57.4",
     "@types/nodemailer": "^7.0.1",
+    "clsx": "^2.1.1",
     "lucide-react": "^0.544.0",
     "next": "15.5.3",
     "nodemailer": "^7.0.6",
@@ -22,6 +24,7 @@
     "react-hook-form": "^7.62.0",
     "react-sortablejs": "^6.1.4",
     "sortablejs": "^1.15.6",
+    "tailwind-merge": "^3.3.1",
     "zod": "^4.1.8"
   },
   "devDependencies": {
