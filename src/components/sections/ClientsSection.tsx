@@ -214,7 +214,7 @@ export default function ClientsSection() {
             {/* Testimonial (pode ser expandido futuramente) */}
             <div className="mt-16 text-center">
               <blockquote className="text-2xl md:text-3xl font-light text-neutral-700 italic mb-6 max-w-4xl mx-auto">
-                "Trabalhar com profissionais dedicados que entendem nossas necessidades e entregam resultados excepcionais faz toda a diferença no sucesso dos nossos projetos."
+                Trabalhar com profissionais dedicados que entendem nossas necessidades e entregam resultados excepcionais faz toda a diferença no sucesso dos nossos projetos.
               </blockquote>
               <div className="text-primary-600 font-semibold">
                 Depoimento de nossos clientes

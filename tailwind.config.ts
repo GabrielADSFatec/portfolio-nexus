@@ -8,7 +8,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Cores primárias (azul principal)
+        // suas cores primárias
         primary: {
           50: '#eff6ff',
           100: '#dbeafe',
@@ -22,7 +22,6 @@ module.exports = {
           900: '#1e3a8a',
           950: '#172554',
         },
-        // Cores secundárias (azul céu)
         secondary: {
           50: '#f0f9ff',
           100: '#e0f2fe',
@@ -35,7 +34,6 @@ module.exports = {
           800: '#075985',
           900: '#0c4a6e',
         },
-        // Cores neutras
         neutral: {
           50: '#f8fafc',
           100: '#f1f5f9',
@@ -49,27 +47,53 @@ module.exports = {
           900: '#0f172a',
           950: '#020617',
         },
-        // Cores de destaque
         accent: {
           blue: '#0066cc',
           'light-blue': '#4da6ff',
           'dark-blue': '#003d7a',
           cyan: '#00b4d8',
         },
+
+        // Variáveis CSS para tema dinâmico
+        border: 'var(--border)',
+        input: 'var(--input)',
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
+        card: 'var(--card)',
+        'card-foreground': 'var(--card-foreground)',
+        'primary-foreground': 'var(--primary-foreground)',
+        'secondary-foreground': 'var(--secondary-foreground)',
+        muted: 'var(--muted)',
+        'muted-foreground': 'var(--muted-foreground)',
+        'accent-foreground': 'var(--accent-foreground)',
+        destructive: 'var(--destructive)',
+        'destructive-foreground': 'var(--destructive-foreground)',
+        ring: 'var(--ring)',
       },
+
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
         mono: ['Monaco', 'Courier New', 'monospace'],
       },
-      boxShadow: {
-        'blue': '0 10px 15px -3px rgb(59 130 246 / 0.2), 0 4px 6px -4px rgb(59 130 246 / 0.1)',
-        'blue-lg': '0 20px 25px -5px rgb(59 130 246 / 0.3), 0 8px 10px -6px rgb(59 130 246 / 0.2)',
+
+      borderRadius: {
+        DEFAULT: 'var(--radius)', // permite usar rounded para radius dinâmico
       },
+
+      boxShadow: {
+        blue: '0 10px 15px -3px rgb(59 130 246 / 0.2), 0 4px 6px -4px rgb(59 130 246 / 0.1)',
+        'blue-lg':
+          '0 20px 25px -5px rgb(59 130 246 / 0.3), 0 8px 10px -6px rgb(59 130 246 / 0.2)',
+      },
+
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-        'hero-pattern': 'linear-gradient(135deg, rgb(37 99 235 / 0.1) 0%, rgb(14 165 233 / 0.1) 100%)',
+        'gradient-conic':
+          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+        'hero-pattern':
+          'linear-gradient(135deg, rgb(37 99 235 / 0.1) 0%, rgb(14 165 233 / 0.1) 100%)',
       },
+
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
         'slide-up': 'slideUp 0.5s ease-out',
@@ -78,6 +102,7 @@ module.exports = {
         'bounce-gentle': 'bounceGentle 2s infinite',
         'pulse-gentle': 'pulseGentle 2s infinite',
       },
+
       keyframes: {
         fadeIn: {
           '0%': { opacity: '0' },
