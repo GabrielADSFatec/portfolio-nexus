@@ -1,3 +1,4 @@
+// src/app/layout.tsx
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
@@ -5,7 +6,12 @@ import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { siteConfig } from '@/constants';
 
-const inter = Inter({ subsets: ['latin'] });
+// Configuração da fonte Inter
+const inter = Inter({ 
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
 
 export const metadata: Metadata = {
   title: {
@@ -54,15 +60,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR" className="scroll-smooth">
-      <body className={inter.className}>
-        <div className="flex min-h-screen flex-col">
-          <Header />
-          <div className="flex-1">
-            {children}
-          </div>
-          <Footer />
+    <html lang="pt-BR" className={`${inter.variable} scroll-smooth`}>
+      <body className="min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-1">
+          {children}
         </div>
+        <Footer />
       </body>
     </html>
   );

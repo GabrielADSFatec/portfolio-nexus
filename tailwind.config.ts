@@ -1,14 +1,18 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+// tailwind.config.ts
+import type { Config } from 'tailwindcss';
+
+const config: Config = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}', // Seus componentes personalizados
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        // suas cores primárias
+        // Suas cores personalizadas com variáveis CSS
         primary: {
           50: '#eff6ff',
           100: '#dbeafe',
@@ -57,6 +61,7 @@ module.exports = {
         // Variáveis CSS para tema dinâmico
         border: 'var(--border)',
         input: 'var(--input)',
+        ring: 'var(--ring)',
         background: 'var(--background)',
         foreground: 'var(--foreground)',
         card: 'var(--card)',
@@ -68,32 +73,43 @@ module.exports = {
         'accent-foreground': 'var(--accent-foreground)',
         destructive: 'var(--destructive)',
         'destructive-foreground': 'var(--destructive-foreground)',
-        ring: 'var(--ring)',
       },
-
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
         mono: ['Monaco', 'Courier New', 'monospace'],
       },
-
       borderRadius: {
-        DEFAULT: 'var(--radius)', // permite usar rounded para radius dinâmico
+        none: '0',
+        sm: '0.125rem',
+        base: '0.25rem',
+        md: '0.375rem',
+        lg: '0.5rem',
+        xl: '0.75rem',
+        '2xl': '1rem',
+        '3xl': '1.5rem',
+        full: '9999px',
       },
-
       boxShadow: {
+        sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+        DEFAULT: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+        md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+        lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+        xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+        '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+        inner: 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
         blue: '0 10px 15px -3px rgb(59 130 246 / 0.2), 0 4px 6px -4px rgb(59 130 246 / 0.1)',
-        'blue-lg':
-          '0 20px 25px -5px rgb(59 130 246 / 0.3), 0 8px 10px -6px rgb(59 130 246 / 0.2)',
+        'blue-lg': '0 20px 25px -5px rgb(59 130 246 / 0.3), 0 8px 10px -6px rgb(59 130 246 / 0.2)',
       },
-
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic':
-          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-        'hero-pattern':
-          'linear-gradient(135deg, rgb(37 99 235 / 0.1) 0%, rgb(14 165 233 / 0.1) 100%)',
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+        'gradient-primary': 'linear-gradient(to right, var(--primary-600), var(--primary-500))',
+        'gradient-secondary': 'linear-gradient(to right, var(--secondary-500), var(--primary-600))',
+        'gradient-hero': 'linear-gradient(to bottom right, var(--primary-600), var(--primary-700), var(--secondary-600))',
+        'gradient-subtle': 'linear-gradient(to right, var(--primary-50), var(--secondary-50))',
+        'gradient-dark': 'linear-gradient(to right, var(--primary-900), var(--primary-800))',
+        'hero-pattern': 'linear-gradient(135deg, rgb(37 99 235 / 0.1) 0%, rgb(14 165 233 / 0.1) 100%)',
       },
-
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
         'slide-up': 'slideUp 0.5s ease-out',
@@ -102,7 +118,6 @@ module.exports = {
         'bounce-gentle': 'bounceGentle 2s infinite',
         'pulse-gentle': 'pulseGentle 2s infinite',
       },
-
       keyframes: {
         fadeIn: {
           '0%': { opacity: '0' },
@@ -132,4 +147,6 @@ module.exports = {
     },
   },
   plugins: [],
-}
+};
+
+export default config;

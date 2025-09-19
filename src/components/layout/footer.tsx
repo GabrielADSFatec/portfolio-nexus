@@ -1,15 +1,18 @@
+// components/layout/footer.tsx
 import Link from 'next/link';
 import { Github, Linkedin, Mail, Heart } from 'lucide-react';
 import { siteConfig } from '@/constants';
-import { customClasses } from '@/constants/themes';
+import { cn } from '@/lib/utils';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
     <footer className="relative">
-      {/* gradiente azul sutil no fundo */}
-      <div className={`${customClasses.gradients.dark} text-neutral-100`}>
+      <div className={cn(
+        "bg-gradient-to-r from-primary-900 to-primary-800",
+        "text-neutral-100 dark:from-primary-950 dark:to-primary-900"
+      )}>
         <div className="container">
           <div className="py-16 grid grid-cols-1 md:grid-cols-4 gap-12">
             {/* Brand section */}

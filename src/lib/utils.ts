@@ -1,3 +1,4 @@
+// lib/utils.ts
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -70,16 +71,16 @@ export function isValidUrl(url: string) {
   }
 }
 
-// Função para debounce
-export function debounce<T extends (...args: any[]) => void>(
+// Função para debounce (corrigida)
+export function debounce<T extends (...args: unknown[]) => void>(
   func: T,
   wait: number
-): T {
+): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout;
-  return ((...args: any[]) => {
+  return (...args: Parameters<T>) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);
-  }) as T;
+  };
 }
 
 // Função para delay

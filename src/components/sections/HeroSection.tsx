@@ -1,3 +1,4 @@
+// components/sections/HeroSection.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -13,7 +14,7 @@ const mockCarouselItems: CarouselItem[] = [
     id: '1',
     title: 'E-commerce Moderno',
     description: 'Plataforma completa de vendas online com dashboard administrativo',
-    image_url: '/api/placeholder/1200/600',
+    image_url: '/images/placeholder.png',
     link_url: '/projeto/ecommerce-moderno',
     order_index: 0,
     is_active: true,
@@ -23,7 +24,7 @@ const mockCarouselItems: CarouselItem[] = [
     id: '2',
     title: 'App de Gestão Financeira',
     description: 'Aplicativo para controle de finanças pessoais com relatórios detalhados',
-    image_url: '/api/placeholder/1200/600',
+    image_url: '/images/placeholder.png',
     link_url: '/projeto/gestao-financeira',
     order_index: 1,
     is_active: true,
@@ -33,7 +34,7 @@ const mockCarouselItems: CarouselItem[] = [
     id: '3',
     title: 'Sistema de Reservas',
     description: 'Plataforma para agendamento e gestão de reservas online',
-    image_url: '/api/placeholder/1200/600',
+    image_url: '/images/placeholder.png',
     link_url: '/projeto/sistema-reservas',
     order_index: 2,
     is_active: true,
@@ -51,12 +52,6 @@ export default function HeroSection() {
     const loadCarouselData = async () => {
       setIsLoading(true);
       // TODO: Substituir por chamada real ao Supabase
-      // const { data, error } = await supabase
-      //   .from('carousel_items')
-      //   .select('*')
-      //   .eq('is_active', true)
-      //   .order('order_index', { ascending: true });
-      
       setTimeout(() => {
         setCarouselItems(mockCarouselItems);
         setIsLoading(false);
@@ -91,7 +86,7 @@ export default function HeroSection() {
 
   if (isLoading) {
     return (
-      <section className="relative h-screen flex items-center justify-center gradient-hero">
+      <section className="relative h-screen flex items-center justify-center bg-gradient-to-br from-primary-600 via-primary-700 to-secondary-600">
         <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-white"></div>
       </section>
     );
@@ -99,7 +94,7 @@ export default function HeroSection() {
 
   if (carouselItems.length === 0) {
     return (
-      <section className="relative h-screen flex items-center justify-center gradient-hero text-white">
+      <section className="relative h-screen flex items-center justify-center bg-gradient-to-br from-primary-600 via-primary-700 to-secondary-600 text-white">
         <div className="text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-4">
             Desenvolvedor Full Stack
@@ -145,14 +140,14 @@ export default function HeroSection() {
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link
                     href={currentItem.link_url}
-                    className="btn btn-primary btn-lg inline-flex items-center gap-2 group"
+                    className="inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500 shadow-md hover:shadow-lg px-8 py-4 text-lg gap-2 group"
                   >
                     Ver Projeto
                     <ExternalLink className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </Link>
                   <Link
                     href="#projetos"
-                    className="btn btn-outline btn-lg border-white text-white hover:bg-white hover:text-primary-600"
+                    className="inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed border-2 border-white text-white hover:bg-white hover:text-primary-600 focus:ring-primary-500 px-8 py-4 text-lg"
                   >
                     Ver Todos os Projetos
                   </Link>
@@ -203,7 +198,7 @@ export default function HeroSection() {
       )}
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 right-8 z-20 animate-bounce-gentle">
+      <div className="absolute bottom-8 right-8 z-20 animate-bounce">
         <div className="w-6 h-10 border-2 border-white/60 rounded-full flex justify-center">
           <div className="w-1 h-3 bg-white/60 rounded-full mt-2 animate-pulse"></div>
         </div>
