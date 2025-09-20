@@ -70,41 +70,41 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neutral-50 to-primary-50/30 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neutral-900 to-primary-950 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
           <Link
             href="/"
-            className="inline-flex items-center space-x-3 font-bold text-2xl text-primary-600 hover:text-primary-700 transition-colors mb-8 group"
+            className="inline-flex items-center space-x-3 font-bold text-2xl text-white hover:text-primary-300 transition-colors mb-8 group"
           >
-            <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center text-white font-bold text-lg group-hover:scale-105 transition-transform">
+            <div className="w-12 h-12 bg-gradient-to-r from-primary-500 to-primary-600 rounded-xl flex items-center justify-center text-white font-bold text-lg group-hover:scale-105 transition-transform">
               {siteConfig.name.charAt(0)}
             </div>
             <div>
               <div className="text-left">
-                <div className="text-lg">{siteConfig.name}</div>
-                <div className="text-sm text-neutral-500 font-normal">Admin Panel</div>
+                <div className="text-lg text-white">{siteConfig.name}</div>
+                <div className="text-sm text-neutral-300 font-normal">Admin Panel</div>
               </div>
             </div>
           </Link>
           
-          <h2 className="text-3xl font-bold text-neutral-900 mb-2">
+          <h2 className="text-3xl font-bold text-white mb-2">
             Acesso Administrativo
           </h2>
-          <p className="text-neutral-600">
+          <p className="text-neutral-300">
             Faça login para gerenciar seu portfólio
           </p>
         </div>
 
         {/* Form Card */}
-        <div className="bg-white/80 backdrop-blur-sm py-10 px-8 shadow-xl rounded-2xl border border-white/50">
+        <div className="bg-white py-10 px-8 shadow-2xl rounded-2xl border border-neutral-200">
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+            <div className="mb-6 p-4 bg-red-100 border-2 border-red-300 rounded-xl flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-red-800 text-sm font-medium">Erro no login</p>
-                <p className="text-red-600 text-sm">{error}</p>
+                <p className="text-red-800 text-sm font-semibold">Erro no login</p>
+                <p className="text-red-700 text-sm">{error}</p>
               </div>
             </div>
           )}
@@ -112,12 +112,12 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email */}
             <div>
-              <label htmlFor="email" className="label">
+              <label htmlFor="email" className="block text-sm font-medium text-neutral-800 mb-1">
                 Email
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-neutral-400" />
+                  <Mail className="h-5 w-5 text-neutral-500" />
                 </div>
                 <input
                   id="email"
@@ -127,8 +127,9 @@ export default function LoginPage() {
                   value={formData.email}
                   onChange={handleInputChange}
                   className={cn(
-                    'input pl-12',
-                    'focus:ring-primary-500 focus:border-primary-500'
+                    'w-full rounded-xl border border-neutral-300 py-3 pl-12',
+                    'focus:ring-2 focus:ring-primary-500 focus:border-primary-500',
+                    'text-neutral-900 placeholder-neutral-400'
                   )}
                   placeholder="seu@email.com"
                   disabled={isLoading}
@@ -139,12 +140,12 @@ export default function LoginPage() {
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className="label">
+              <label htmlFor="password" className="block text-sm font-medium text-neutral-800 mb-1">
                 Senha
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-neutral-400" />
+                  <Lock className="h-5 w-5 text-neutral-500" />
                 </div>
                 <input
                   id="password"
@@ -154,8 +155,9 @@ export default function LoginPage() {
                   value={formData.password}
                   onChange={handleInputChange}
                   className={cn(
-                    'input pl-12 pr-12',
-                    'focus:ring-primary-500 focus:border-primary-500'
+                    'w-full rounded-xl border border-neutral-300 py-3 pl-12 pr-12',
+                    'focus:ring-2 focus:ring-primary-500 focus:border-primary-500',
+                    'text-neutral-900 placeholder-neutral-400'
                   )}
                   placeholder="Sua senha"
                   disabled={isLoading}
@@ -168,9 +170,9 @@ export default function LoginPage() {
                   disabled={isLoading}
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-neutral-400 hover:text-neutral-600 transition-colors" />
+                    <EyeOff className="h-5 w-5 text-neutral-500 hover:text-neutral-700 transition-colors" />
                   ) : (
-                    <Eye className="h-5 w-5 text-neutral-400 hover:text-neutral-600 transition-colors" />
+                    <Eye className="h-5 w-5 text-neutral-500 hover:text-neutral-700 transition-colors" />
                   )}
                 </button>
               </div>
@@ -181,9 +183,17 @@ export default function LoginPage() {
               type="submit"
               disabled={isLoading || !formData.email || !formData.password}
               className={cn(
-                'btn btn-primary w-full py-4 text-lg font-semibold',
-                'shadow-lg shadow-primary-600/25 hover:shadow-xl hover:shadow-primary-600/30',
-                (isLoading || !formData.email || !formData.password) && 'opacity-50 cursor-not-allowed'
+                'w-full py-4 px-6 text-lg font-medium rounded-xl',
+                'bg-gradient-to-r from-blue-600 to-indigo-600',
+                'hover:from-blue-700 hover:to-indigo-700',
+                'active:from-blue-800 active:to-indigo-800',
+                'text-white tracking-wide',
+                'transition-all duration-200 ease-in-out',
+                'shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-600/30',
+                'border border-blue-500/20',
+                'transform hover:-translate-y-0.5 active:translate-y-0',
+                (isLoading || !formData.email || !formData.password) && 
+                'opacity-50 cursor-not-allowed hover:translate-y-0 hover:shadow-lg'
               )}
             >
               {isLoading ? (
@@ -212,12 +222,12 @@ export default function LoginPage() {
         </div>
 
         {/* Security note */}
-        <div className="bg-primary-50/50 backdrop-blur-sm p-6 rounded-xl border border-primary-200/50 text-center">
-          <div className="flex items-center justify-center gap-2 text-primary-700 mb-2">
+        <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20 text-center">
+          <div className="flex items-center justify-center gap-2 text-white mb-2">
             <Lock className="w-4 h-4" />
             <span className="text-sm font-medium">Área Segura</span>
           </div>
-          <p className="text-xs text-primary-600">
+          <p className="text-xs text-neutral-300">
             Esta área é protegida e monitorada. Apenas administradores autorizados podem acessar.
           </p>
         </div>
