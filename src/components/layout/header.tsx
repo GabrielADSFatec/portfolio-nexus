@@ -1,39 +1,35 @@
-// components/layout/header.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { publicNavigation, siteConfig } from '@/constants';
-import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const pathname = usePathname();
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleLinkClick = () => setIsMobileMenuOpen(false);
-
-  // Verifica se está em uma rota administrativa ou de login
-  const isExcludedRoute = pathname === '/login' || pathname.startsWith('/admin');
-
-  // Se estiver na página de login ou em uma rota administrativa, não renderiza o header
-  if (isExcludedRoute) return null;
+  const handleLinkClick = () => {
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <header
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
         isScrolled
-          ? 'bg-white/90 backdrop-blur-lg shadow-md dark:bg-neutral-900/90'
-          : 'bg-gradient-to-br from-primary-600 via-primary-700 to-secondary-600'
+          ? 'bg-white/95 backdrop-blur-lg shadow-lg border-b border-white/20'
+          : 'bg-black/20 backdrop-blur-md border-b border-white/10'
       )}
     >
       <div className="container">
@@ -42,21 +38,19 @@ export default function Header() {
           <Link
             href="/"
             className={cn(
-              "flex items-center space-x-3 font-bold text-xl lg:text-2xl transition-colors",
+              "flex items-center space-x-2 font-bold text-xl lg:text-2xl transition-colors group",
               isScrolled 
-                ? "text-neutral-900 dark:text-white" 
-                : "text-white"
+                ? "text-primary-600 hover:text-primary-700" 
+                : "text-white hover:text-primary-200 drop-shadow-lg"
             )}
           >
             <div className={cn(
-              "w-10 h-10 rounded-xl flex items-center justify-center font-bold shadow-md",
-              isScrolled 
-                ? "bg-primary-600 text-white" 
-                : "bg-white/20 text-white"
+              "w-8 h-8 lg:w-10 lg:h-10 bg-gradient-primary rounded-lg flex items-center justify-center text-white font-bold shadow-lg group-hover:scale-105 transition-transform",
+              !isScrolled && "shadow-black/30"
             )}>
               {siteConfig.name.charAt(0)}
             </div>
-            <span>{siteConfig.name}</span>
+            <span className={!isScrolled ? "drop-shadow-sm" : ""}>{siteConfig.name}</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -66,10 +60,11 @@ export default function Header() {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  'font-medium transition-colors',
-                  'text-white hover:text-primary-200'
+                  'font-medium transition-all duration-200 hover:scale-105',
+                  isScrolled 
+                    ? 'text-neutral-700 hover:text-primary-600' 
+                    : 'text-white hover:text-primary-200 drop-shadow-sm hover:drop-shadow-md'
                 )}
-                onClick={handleLinkClick}
               >
                 {item.name}
               </Link>
@@ -79,24 +74,18 @@ export default function Header() {
           {/* Mobile Menu Button */}
           <button
             className={cn(
-              "md:hidden p-2 rounded-lg transition-colors",
-              isScrolled
-                ? "hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                : "hover:bg-white/20"
+              "md:hidden p-2 rounded-lg transition-all duration-200 hover:scale-105",
+              isScrolled 
+                ? "hover:bg-neutral-100 text-neutral-700" 
+                : "hover:bg-white/20 text-white backdrop-blur-sm"
             )}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle mobile menu"
           >
             {isMobileMenuOpen ? (
-              <X className={cn(
-                "w-6 h-6",
-                isScrolled ? "text-neutral-700 dark:text-white" : "text-white"
-              )} />
+              <X className="w-6 h-6 drop-shadow-sm" />
             ) : (
-              <Menu className={cn(
-                "w-6 h-6",
-                isScrolled ? "text-neutral-700 dark:text-white" : "text-white"
-              )} />
+              <Menu className="w-6 h-6 drop-shadow-sm" />
             )}
           </button>
         </div>
@@ -104,23 +93,13 @@ export default function Header() {
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
           <div className="md:hidden">
-            <div className={cn(
-              "rounded-xl shadow-lg mt-2 py-4",
-              isScrolled
-                ? "bg-white dark:bg-neutral-800"
-                : "bg-white/10 backdrop-blur-md"
-            )}>
+            <div className="bg-white/95 backdrop-blur-lg rounded-lg shadow-xl mt-2 py-4 border border-white/20">
               <nav className="flex flex-col space-y-1">
                 {publicNavigation.map((item) => (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={cn(
-                      "px-4 py-3 font-medium transition-colors",
-                      isScrolled
-                        ? "text-neutral-700 hover:bg-neutral-50 hover:text-primary-600 dark:text-neutral-300 dark:hover:bg-neutral-700"
-                        : "text-white hover:bg-white/20"
-                    )}
+                    className="px-4 py-3 font-medium text-neutral-700 hover:bg-primary-50 hover:text-primary-600 transition-all duration-200 hover:translate-x-1"
                     onClick={handleLinkClick}
                   >
                     {item.name}

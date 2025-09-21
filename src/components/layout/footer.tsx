@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Github, Linkedin, Mail, Heart } from 'lucide-react';
 import { siteConfig } from '@/constants';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -28,7 +29,7 @@ export default function Footer() {
   return (
     <footer className="relative bg-gradient-to-br from-neutral-900 via-primary-950 to-neutral-950">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/10 to-black/30" />
-      
+
       <div className="container relative">
         <div className="py-16 grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand section */}
@@ -126,9 +127,14 @@ export default function Footer() {
         <div className="py-8 border-t border-white/10">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
             <div className="flex items-center gap-2 text-neutral-500">
-              <span>© {currentYear} {siteConfig.name}. Feito com</span>
-              <Heart className="w-4 h-4 text-red-400 fill-current animate-pulse" />
-              <span>e muito código.</span>
+              <Image
+                src="/logo-nexus.png"
+                alt="Logo da empresa"
+                width={20}
+                height={20}
+              />
+              <span>© {currentYear} Feito por {siteConfig.name}.</span>
+              <span>e Fatec Itu</span>
             </div>
 
             <div className="flex items-center gap-6">

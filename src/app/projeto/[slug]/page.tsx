@@ -48,20 +48,7 @@ async function getRelatedProjects(currentProjectId: string, limit: number = 3): 
   
   const { data, error } = await supabase
     .from('projects')
-    .select(`
-      id,
-      title,
-      slug,
-      description,
-      image_url,
-      technologies,
-      github_url,
-      live_url,
-      order_index,
-      is_featured,
-      is_active,
-      created_at
-    `)
+    .select('*') // ← Selecionar todos os campos, não apenas alguns
     .neq('id', currentProjectId)
     .eq('is_active', true)
     .order('created_at', { ascending: false })
@@ -72,7 +59,8 @@ async function getRelatedProjects(currentProjectId: string, limit: number = 3): 
 
 // Generate metadata
 export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
-  const project = await getProject(params.slug);
+  const { slug } = await params; // ← Await params primeiro
+  const project = await getProject(slug);
 
   if (!project) {
     return {
@@ -92,7 +80,8 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
-  const project = await getProject(params.slug);
+  const { slug } = await params; // ← Await params primeiro
+  const project = await getProject(slug);
 
   if (!project) {
     notFound();
@@ -101,33 +90,33 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   const relatedProjects = await getRelatedProjects(project.id);
 
   return (
-    <main className="min-h-screen pt-20">
+    <main className="min-h-screen pt-20 bg-neutral-50">
       {/* Hero Section */}
-      <section className="py-12 bg-gradient-to-br from-neutral-50 to-primary-50/30">
+      <section className="py-12 bg-gradient-to-br from-white via-primary-50/30 to-secondary-50/20">
         <div className="container">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-neutral-600 mb-8">
             <Link 
               href="/"
-              className="hover:text-primary-600 transition-colors"
+              className="hover:text-primary-600 transition-colors font-medium"
             >
               Início
             </Link>
-            <span>/</span>
+            <span className="text-neutral-400">/</span>
             <Link 
               href="/#projetos"
-              className="hover:text-primary-600 transition-colors"
+              className="hover:text-primary-600 transition-colors font-medium"
             >
               Projetos
             </Link>
-            <span>/</span>
-            <span className="text-neutral-900 font-medium">{project.title}</span>
+            <span className="text-neutral-400">/</span>
+            <span className="text-neutral-800 font-semibold">{project.title}</span>
           </div>
 
           {/* Back button */}
           <Link
             href="/#projetos"
-            className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium mb-8 group"
+            className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-semibold mb-8 group bg-white px-4 py-2 rounded-lg shadow-sm border border-primary-100 hover:shadow-md transition-all"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             Voltar aos Projetos
@@ -137,35 +126,44 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             {/* Project Info */}
             <div className="animate-fade-in">
               <div className="flex items-center gap-3 mb-6">
-                <h1 className="text-4xl md:text-5xl font-bold text-neutral-900">
+                <h1 className="text-4xl md:text-5xl font-bold text-neutral-900 leading-tight">
                   {project.title}
                 </h1>
                 {project.is_featured && (
-                  <span className="px-3 py-1 bg-gradient-primary text-white rounded-full text-sm font-medium shadow-md">
-                    ⭐ Destaque
+                  <span className="px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-400 text-white rounded-full text-sm font-bold shadow-lg flex items-center gap-1">
+                    <span>⭐</span>
+                    Destaque
                   </span>
                 )}
               </div>
 
-              <p className="text-xl text-neutral-600 mb-8 leading-relaxed">
+              <p className="text-xl text-neutral-700 mb-8 leading-relaxed font-medium">
                 {project.description}
               </p>
 
-              {/* Project Meta */}
+              {/* Project Meta Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                <div className="flex items-center gap-3 p-4 bg-white rounded-lg border border-neutral-200">
-                  <Calendar className="w-5 h-5 text-primary-600" />
-                  <div>
-                    <div className="text-sm text-neutral-500">Criado em</div>
-                    <div className="font-medium">{formatDate(project.created_at)}</div>
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral-100 hover:shadow-md transition-all">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
+                      <Calendar className="w-6 h-6 text-primary-600" />
+                    </div>
+                    <div>
+                      <div className="text-sm text-neutral-500 font-medium">Criado em</div>
+                      <div className="text-lg font-semibold text-neutral-900">{formatDate(project.created_at)}</div>
+                    </div>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3 p-4 bg-white rounded-lg border border-neutral-200">
-                  <Code className="w-5 h-5 text-secondary-600" />
-                  <div>
-                    <div className="text-sm text-neutral-500">Tecnologias</div>
-                    <div className="font-medium">{project.technologies.length} utilizadas</div>
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral-100 hover:shadow-md transition-all">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-secondary-100 rounded-lg flex items-center justify-center">
+                      <Code className="w-6 h-6 text-secondary-600" />
+                    </div>
+                    <div>
+                      <div className="text-sm text-neutral-500 font-medium">Tecnologias</div>
+                      <div className="text-lg font-semibold text-neutral-900">{project.technologies.length} utilizadas</div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -177,7 +175,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                     href={project.live_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn btn-primary btn-lg inline-flex items-center gap-2 group shadow-lg shadow-primary-600/25"
+                    className="btn btn-primary btn-lg inline-flex items-center gap-3 group shadow-lg shadow-primary-600/25 hover:shadow-xl hover:shadow-primary-600/30 transition-all"
                   >
                     <Zap className="w-5 h-5" />
                     Ver Projeto Online
@@ -190,7 +188,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                     href={project.github_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn btn-outline btn-lg inline-flex items-center gap-2 group"
+                    className="btn btn-outline btn-lg inline-flex items-center gap-3 group bg-white hover:bg-neutral-900 hover:text-white border-neutral-300 hover:border-neutral-900 transition-all"
                   >
                     <Github className="w-5 h-5" />
                     Ver Código
@@ -199,9 +197,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               </div>
 
               {/* Technologies */}
-              <div>
-                <h3 className="font-semibold text-neutral-900 mb-4 flex items-center gap-2">
-                  <Tag className="w-5 h-5" />
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral-100">
+                <h3 className="font-bold text-neutral-900 mb-4 flex items-center gap-2 text-lg">
+                  <Tag className="w-5 h-5 text-primary-600" />
                   Tecnologias Utilizadas
                 </h3>
                 <div className="flex flex-wrap gap-3">
@@ -209,10 +207,11 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                     <span
                       key={tech}
                       className={cn(
-                        "px-4 py-2 rounded-lg font-medium text-sm shadow-sm",
-                        index % 3 === 0 && "bg-primary-50 text-primary-700 border border-primary-200",
-                        index % 3 === 1 && "bg-secondary-50 text-secondary-700 border border-secondary-200",
-                        index % 3 === 2 && "bg-green-50 text-green-700 border border-green-200"
+                        "px-4 py-2 rounded-lg font-semibold text-sm shadow-sm border transition-all hover:scale-105",
+                        index % 4 === 0 && "bg-primary-50 text-primary-800 border-primary-200 hover:bg-primary-100",
+                        index % 4 === 1 && "bg-secondary-50 text-secondary-800 border-secondary-200 hover:bg-secondary-100",
+                        index % 4 === 2 && "bg-green-50 text-green-800 border-green-200 hover:bg-green-100",
+                        index % 4 === 3 && "bg-purple-50 text-purple-800 border-purple-200 hover:bg-purple-100"
                       )}
                     >
                       {tech}
@@ -237,11 +236,11 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 projectTitle={project.title}
               />
               
-              {/* Floating badges */}
-              <div className="absolute -bottom-4 -left-4 bg-white rounded-xl p-4 shadow-lg border border-neutral-200">
-                <div className="flex items-center gap-2 text-sm">
-                  <Users className="w-4 h-4 text-green-600" />
-                  <span className="font-medium text-neutral-900">Projeto Real</span>
+              {/* Floating badge */}
+              <div className="absolute -bottom-4 -left-4 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl p-4 shadow-lg text-white">
+                <div className="flex items-center gap-2 text-sm font-semibold">
+                  <Users className="w-4 h-4" />
+                  <span>Projeto Real</span>
                 </div>
               </div>
             </div>
@@ -253,22 +252,30 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       <section className="py-20 bg-white">
         <div className="container">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-neutral-900 mb-8 text-center">
-              Detalhes do Projeto
-            </h2>
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-4">
+                Detalhes do Projeto
+              </h2>
+              <div className="w-24 h-1 bg-gradient-primary mx-auto rounded-full"></div>
+            </div>
             
             {project.full_description ? (
-              <div 
-                className="prose prose-lg prose-neutral max-w-none prose-headings:text-neutral-900 prose-headings:font-semibold prose-a:text-primary-600 prose-strong:text-neutral-900"
-                dangerouslySetInnerHTML={{ __html: project.full_description }}
-              />
+              <div className="bg-white rounded-2xl shadow-lg border border-neutral-100 p-8 md:p-12">
+                <div 
+                  className="prose prose-lg prose-neutral max-w-none prose-headings:text-neutral-900 prose-headings:font-bold prose-p:text-neutral-700 prose-p:leading-relaxed prose-a:text-primary-600 prose-strong:text-neutral-900 prose-ul:text-neutral-700 prose-li:text-neutral-700"
+                  dangerouslySetInnerHTML={{ __html: project.full_description }}
+                />
+              </div>
             ) : (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Code className="w-8 h-8 text-neutral-400" />
+              <div className="text-center py-16 bg-neutral-50 rounded-2xl border border-neutral-200">
+                <div className="w-20 h-20 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Code className="w-10 h-10 text-neutral-400" />
                 </div>
-                <p className="text-neutral-500">
-                  Descrição detalhada em breve...
+                <h3 className="text-xl font-semibold text-neutral-900 mb-2">
+                  Descrição Detalhada
+                </h3>
+                <p className="text-neutral-600">
+                  A descrição completa deste projeto será adicionada em breve...
                 </p>
               </div>
             )}
@@ -278,43 +285,60 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
       {/* Related Projects */}
       {relatedProjects.length > 0 && (
-        <section className="py-20 bg-neutral-50">
+        <section className="py-20 bg-gradient-to-br from-neutral-50 to-primary-50/20">
           <div className="container">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-neutral-900 mb-4">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-4">
                 Outros Projetos
               </h2>
-              <p className="text-neutral-600">
+              <p className="text-xl text-neutral-600 max-w-2xl mx-auto">
                 Confira outros trabalhos que desenvolvi
               </p>
+              <div className="w-24 h-1 bg-gradient-secondary mx-auto rounded-full mt-6"></div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {relatedProjects.map((relatedProject, index) => (
                 <div 
                   key={relatedProject.id}
-                  className="group animate-fade-in"
+                  className="group animate-fade-in hover:scale-105 transition-all duration-300"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className="card-hover p-0 overflow-hidden h-full flex flex-col">
+                  <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-neutral-100 h-full flex flex-col">
                     <div className="relative aspect-video overflow-hidden">
                       <Image
                         src={relatedProject.image_url}
                         alt={relatedProject.title}
                         fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
                       />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                     <div className="p-6 flex-1 flex flex-col">
-                      <h3 className="text-xl font-semibold text-neutral-900 mb-3 group-hover:text-primary-600 transition-colors">
+                      <h3 className="text-xl font-bold text-neutral-900 mb-3 group-hover:text-primary-600 transition-colors">
                         {relatedProject.title}
                       </h3>
-                      <p className="text-neutral-600 mb-4 line-clamp-3 flex-1">
+                      <p className="text-neutral-600 mb-4 line-clamp-3 flex-1 leading-relaxed">
                         {relatedProject.description}
                       </p>
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {relatedProject.technologies.slice(0, 3).map((tech) => (
+                          <span
+                            key={tech}
+                            className="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-xs font-medium"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                        {relatedProject.technologies.length > 3 && (
+                          <span className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-xs font-medium">
+                            +{relatedProject.technologies.length - 3}
+                          </span>
+                        )}
+                      </div>
                       <Link
                         href={`/projeto/${relatedProject.slug}`}
-                        className="btn btn-outline w-full group/btn"
+                        className="btn btn-outline w-full group/btn border-neutral-200 text-neutral-700 hover:bg-primary-600 hover:border-primary-600 hover:text-white transition-all"
                       >
                         Ver Projeto
                         <ExternalLink className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
@@ -325,10 +349,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               ))}
             </div>
 
-            <div className="text-center mt-12">
+            <div className="text-center mt-16">
               <Link
                 href="/#projetos"
-                className="btn btn-primary btn-lg"
+                className="btn btn-primary btn-lg shadow-lg shadow-primary-600/25 hover:shadow-xl hover:shadow-primary-600/30 transition-all"
               >
                 Ver Todos os Projetos
               </Link>

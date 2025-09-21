@@ -2,12 +2,6 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function updateSession(request: NextRequest) {
-  // 🔍 DEBUG - Vamos ver se as variáveis estão carregando
-  console.log('🔍 ENV DEBUG:', {
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    key_publishable: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
-    key_anon: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  });
 
   let supabaseResponse = NextResponse.next({
     request,

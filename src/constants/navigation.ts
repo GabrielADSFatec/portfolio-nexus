@@ -77,7 +77,7 @@ export const socialLinks = [
 
 // Configurações do site
 export const siteConfig = {
-  name: 'Seu Nome',
+  name: 'NexusJr',
   title: 'Desenvolvedor Full Stack',
   description: 'Desenvolvedor especializado em React, Next.js e Node.js',
   url: 'https://seusite.com',
