@@ -13,6 +13,7 @@ import {
   Activity
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { cn } from '@/lib/utils';  // Add this import
 import type { Metadata } from 'next';
 
 interface DashboardStats {
@@ -72,15 +73,28 @@ export default function DashboardPage() {
     loadStats();
   }, [supabase]);
 
+  const nextSteps = [
+    { status: 'done', title: 'Sistema de autenticação', desc: 'Login e middleware funcionando' },
+    { status: 'done', title: 'Banco de dados', desc: 'Tabelas criadas e dados de exemplo' },
+    { status: 'pending', title: 'Páginas CRUD', desc: 'Criar interfaces para gerenciar conteúdo' },
+    { status: 'pending', title: 'Upload de imagens', desc: 'Sistema para upload de fotos dos projetos' },
+  ];
+
+  const siteRoutes = [
+    { label: 'Homepage', value: 'Carrossel + Projetos + Clientes' },
+    { label: 'Projeto Individual', value: '/projeto/[slug]' },
+    { label: 'Admin', value: '/admin (onde você está)' },
+  ];
+
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="min-h-screen bg-neutral-900 p-6 md:p-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-white p-6 rounded-xl shadow-sm border border-neutral-200 animate-pulse">
-              <div className="w-12 h-12 bg-neutral-200 rounded-lg mb-4"></div>
-              <div className="h-4 bg-neutral-200 rounded mb-2"></div>
-              <div className="h-6 bg-neutral-200 rounded"></div>
+            <div key={i} className="bg-neutral-800/50 p-6 rounded-xl shadow-sm border border-neutral-700/50 animate-pulse">
+              <div className="w-12 h-12 bg-neutral-700 rounded-lg mb-4"></div>
+              <div className="h-4 bg-neutral-700 rounded mb-2"></div>
+              <div className="h-6 bg-neutral-700 rounded"></div>
             </div>
           ))}
         </div>
@@ -89,14 +103,15 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="min-h-screen bg-neutral-900 p-6 md:p-8 space-y-8">
       {/* Welcome Header */}
-      <div>
-        <h2 className="text-3xl font-bold text-neutral-900 mb-2">
-          Bem-vindo ao Dashboard! 👋
+      <div className="bg-neutral-800/50 p-6 rounded-xl shadow-sm border border-neutral-700/50">
+        <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 flex items-center gap-3">
+          <Activity className="w-8 h-8 text-primary-500" />
+          Dashboard Administrativo
         </h2>
-        <p className="text-neutral-600">
-          Aqui você pode gerenciar todo o conteúdo do seu portfólio
+        <p className="text-neutral-400">
+          Gerencie todo o conteúdo do seu portfólio em um só lugar
         </p>
       </div>
 
@@ -196,70 +211,56 @@ export default function DashboardPage() {
       {/* Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Actions */}
-        <div className="bg-white rounded-xl shadow-sm border border-neutral-200 p-6">
-          <h3 className="text-lg font-semibold text-neutral-900 mb-4 flex items-center gap-2">
-            <Plus className="w-5 h-5" />
+        <div className="bg-neutral-800/50 rounded-xl shadow-sm border border-neutral-700/50 p-6 hover:shadow-md transition-all">
+          <h3 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
+            <Plus className="w-5 h-5 text-primary-500" />
             Próximos Passos
           </h3>
           
-          <div className="space-y-4 text-sm text-neutral-600">
-            <div className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-              <div>
-                <p className="font-medium text-neutral-900">✅ Sistema de autenticação</p>
-                <p>Login e middleware funcionando</p>
+          <div className="space-y-6">
+            {nextSteps.map((item, i) => (
+              <div key={i} className="flex items-start gap-4 p-4 rounded-lg bg-neutral-800/50 border border-neutral-700/50">
+                <div className={cn(
+                  "w-2 h-2 rounded-full mt-2 flex-shrink-0",
+                  item.status === 'done' ? 'bg-green-500' : 'bg-yellow-500'
+                )}></div>
+                <div>
+                  <p className="font-medium text-white">
+                    {item.status === 'done' ? '✅ ' : '⏳ '}{item.title}
+                  </p>
+                  <p className="text-neutral-400 text-sm">{item.desc}</p>
+                </div>
               </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-              <div>
-                <p className="font-medium text-neutral-900">✅ Banco de dados</p>
-                <p>Tabelas criadas e dados de exemplo</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></div>
-              <div>
-                <p className="font-medium text-neutral-900">⏳ Páginas CRUD</p>
-                <p>Criar interfaces para gerenciar conteúdo</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></div>
-              <div>
-                <p className="font-medium text-neutral-900">⏳ Upload de imagens</p>
-                <p>Sistema para upload de fotos dos projetos</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
         {/* Site Preview */}
-        <div className="bg-white rounded-xl shadow-sm border border-neutral-200 p-6">
-          <h3 className="text-lg font-semibold text-neutral-900 mb-4 flex items-center gap-2">
+        <div className="bg-gradient-to-br from-primary-900 to-primary-800 rounded-xl shadow-lg p-6 text-white">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <Eye className="w-5 h-5" />
             Site Público
           </h3>
           
-          <p className="text-neutral-600 mb-4">
+          <p className="text-primary-200 mb-6">
             Seu portfólio está funcionando com dados reais do Supabase!
           </p>
 
           <Link
             href="/"
             target="_blank"
-            className="btn btn-primary w-full"
+            className="inline-flex items-center justify-center w-full gap-2 px-6 py-3 text-sm font-medium text-white bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
           >
             🌐 Ver Site Público
           </Link>
 
-          <div className="mt-4 p-3 bg-neutral-50 rounded-lg text-sm text-neutral-600">
-            <p><strong>Homepage:</strong> Carrossel + Projetos + Clientes</p>
-            <p><strong>Projeto Individual:</strong> /projeto/[slug]</p>
-            <p><strong>Admin:</strong> /admin (onde você está)</p>
+          <div className="mt-6 space-y-3">
+            {siteRoutes.map((item, i) => (
+              <div key={i} className="flex items-center gap-2 text-sm">
+                <span className="font-semibold text-primary-200">{item.label}:</span>
+                <span className="text-primary-300">{item.value}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>

@@ -7,17 +7,17 @@ export const publicNavigation = [
   },
   {
     name: 'Projetos',
-    href: '#projetos',
+    href: '/#projetos',  // Modificado
     icon: 'Briefcase',
   },
   {
     name: 'Clientes',
-    href: '#clientes',
+    href: '/#clientes',  // Modificado
     icon: 'Users',
   },
   {
     name: 'Contato',
-    href: '#contato',
+    href: '/#contato',   // Modificado
     icon: 'Mail',
   },
 ] as const;

@@ -1,15 +1,17 @@
 // components/layout/header.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
-import { publicNavigation, siteConfig } from '@/constants';
 import { cn } from '@/lib/utils';
+import { publicNavigation, siteConfig } from '@/constants';
+import { usePathname } from 'next/navigation';
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -18,6 +20,12 @@ export default function Header() {
   }, []);
 
   const handleLinkClick = () => setIsMobileMenuOpen(false);
+
+  // Verifica se está em uma rota administrativa ou de login
+  const isExcludedRoute = pathname === '/login' || pathname.startsWith('/admin');
+
+  // Se estiver na página de login ou em uma rota administrativa, não renderiza o header
+  if (isExcludedRoute) return null;
 
   return (
     <header
@@ -59,10 +67,9 @@ export default function Header() {
                 href={item.href}
                 className={cn(
                   'font-medium transition-colors',
-                  isScrolled
-                    ? 'text-neutral-700 hover:text-primary-600 dark:text-neutral-300 dark:hover:text-primary-400'
-                    : 'text-white hover:text-primary-200'
+                  'text-white hover:text-primary-200'
                 )}
+                onClick={handleLinkClick}
               >
                 {item.name}
               </Link>

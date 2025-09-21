@@ -12,7 +12,7 @@ const mockClients: Client[] = [
   {
     id: '1',
     name: 'TechCorp Solutions',
-    logo_url: '/api/placeholder/200/100',
+    logo_url: '/images/placeholder.png', // atualizado
     website_url: 'https://techcorp.com',
     description: 'Empresa de tecnologia focada em soluções empresariais',
     order_index: 0,
@@ -22,7 +22,7 @@ const mockClients: Client[] = [
   {
     id: '2',
     name: 'StartupXYZ',
-    logo_url: '/api/placeholder/200/100',
+    logo_url: '/images/placeholder.png', // atualizado
     website_url: 'https://startupxyz.com',
     description: 'Startup inovadora no setor de fintech',
     order_index: 1,
@@ -32,7 +32,7 @@ const mockClients: Client[] = [
   {
     id: '3',
     name: 'Digital Agency',
-    logo_url: '/api/placeholder/200/100',
+    logo_url: '/images/placeholder.png', // atualizado
     website_url: 'https://digitalagency.com',
     description: 'Agência digital especializada em marketing online',
     order_index: 2,
@@ -42,7 +42,7 @@ const mockClients: Client[] = [
   {
     id: '4',
     name: 'E-commerce Plus',
-    logo_url: '/api/placeholder/200/100',
+    logo_url: '/images/placeholder.png', // atualizado
     website_url: 'https://ecommerceplus.com',
     description: 'Plataforma de e-commerce para pequenas empresas',
     order_index: 3,
@@ -52,7 +52,7 @@ const mockClients: Client[] = [
   {
     id: '5',
     name: 'HealthTech',
-    logo_url: '/api/placeholder/200/100',
+    logo_url: '/images/placeholder.png', // atualizado
     website_url: 'https://healthtech.com',
     description: 'Tecnologia aplicada à área da saúde',
     order_index: 4,
@@ -62,7 +62,7 @@ const mockClients: Client[] = [
   {
     id: '6',
     name: 'EduPlatform',
-    logo_url: '/api/placeholder/200/100',
+    logo_url: '/images/placeholder.png', // atualizado
     website_url: 'https://eduplatform.com',
     description: 'Plataforma educacional online',
     order_index: 5,
@@ -214,7 +214,7 @@ export default function ClientsSection() {
             {/* Testimonial (pode ser expandido futuramente) */}
             <div className="mt-16 text-center">
               <blockquote className="text-2xl md:text-3xl font-light text-neutral-700 italic mb-6 max-w-4xl mx-auto">
-                Trabalhar com profissionais dedicados que entendem nossas necessidades e entregam resultados excepcionais faz toda a diferença no sucesso dos nossos projetos.
+                "Trabalhar com profissionais dedicados que entendem nossas necessidades e entregam resultados excepcionais faz toda a diferença no sucesso dos nossos projetos."
               </blockquote>
               <div className="text-primary-600 font-semibold">
                 Depoimento de nossos clientes

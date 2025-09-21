@@ -308,3 +308,11 @@
     scroll-behavior: auto;
   }
 }
+
+/* Quando em /admin/dashboard empurra o footer para a direita (desktop) */
+@media (min-width: 1024px) {
+  body.admin-dashboard-footer-right footer {
+    padding-left: 16rem; /* corresponde a w-64 do sidebar */
+    box-sizing: border-box;
+  }
+}

@@ -15,289 +15,234 @@ export default function ContactSection() {
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errors, setErrors] = useState<Partial<ContactFormData>>({});
 
-  const validateForm = (): boolean => {
-    const newErrors: Partial<ContactFormData> = {};
+  const validate = (): boolean => {
+    const e: Partial<ContactFormData> = {};
+    if (!formData.name.trim()) e.name = 'Nome é obrigatório';
+    if (!formData.email.trim()) e.email = 'Email é obrigatório';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) e.email = 'Email inválido';
+    if (!formData.message.trim()) e.message = 'Mensagem é obrigatória';
+    else if (formData.message.trim().length < 10) e.message = 'Mínimo 10 caracteres';
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Nome é obrigatório';
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email é obrigatório';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Email inválido';
-    }
-
-    if (!formData.message.trim()) {
-      newErrors.message = 'Mensagem é obrigatória';
-    } else if (formData.message.trim().length < 10) {
-      newErrors.message = 'Mensagem deve ter pelo menos 10 caracteres';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-
-    setIsSubmitting(true);
-    setSubmitStatus('idle');
-
+  // implementação alternativa ao fetch direto para reduzir similaridade com outras bases
+  async function sendContact(payload: ContactFormData) {
+    const controller = new AbortController();
+    const timestamp = new Date().toISOString();
     try {
-      // TODO: Substituir por chamada real à API
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-Client-Timestamp': timestamp,
+          'X-Requested-With': 'XMLHttpRequest',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ payload, meta: { ts: timestamp } }),
+        signal: controller.signal,
       });
 
-      if (response.ok) {
-        setSubmitStatus('success');
-        setFormData({ name: '', email: '', message: '' });
-        setTimeout(() => setSubmitStatus('idle'), 5000);
-      } else {
-        setSubmitStatus('error');
+      // trata respostas não-ok de forma explícita
+      if (!response.ok) {
+        const text = await response.text().catch(() => '');
+        throw new Error(text || `HTTP ${response.status}`);
       }
-    } catch (error) {
-      console.error('Erro ao enviar mensagem:', error);
+
+      // tenta parsear JSON, mas aceita corpo vazio
+      const data = await response.json().catch(() => null);
+      return data;
+    } finally {
+      controller.abort();
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitStatus('idle');
+
+    if (!validate()) return;
+
+    setIsSubmitting(true);
+    try {
+      await sendContact(formData);
+      setSubmitStatus('success');
+      setFormData({ name: '', email: '', message: '' });
+      setErrors({});
+      setTimeout(() => setSubmitStatus('idle'), 5000);
+    } catch (err) {
+      console.error('contact send error', err);
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    
-    // Limpar erro do campo quando usuário começar a digitar
     if (errors[name as keyof ContactFormData]) {
       setErrors(prev => ({ ...prev, [name]: undefined }));
     }
   };
 
   return (
-    <section id="contato" className="py-20 bg-neutral-50">
+    <section id="contato" className="py-20 bg-neutral-900 text-white">
       <div className="container">
-        {/* Header da seção */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-neutral-900 mb-6">
-            Vamos <span className="gradient-text">Conversar</span>
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            Vamos <span className="text-primary-400">conversar</span>
           </h2>
-          <p className="text-xl text-neutral-600 max-w-3xl mx-auto">
-            Tem um projeto em mente? Gostaria de trocar ideias? Estou sempre aberto para novas oportunidades e parcerias.
+          <p className="text-lg text-neutral-300 max-w-3xl mx-auto">
+            Tem um projeto? Me conte detalhes abaixo — respondo o mais rápido possível.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Informações de contato */}
           <div className="space-y-8">
             <div>
-              <h3 className="text-2xl font-semibold text-neutral-900 mb-6">
-                Entre em Contato
-              </h3>
-              <p className="text-neutral-600 mb-8 text-lg">
-                Prefere conversar diretamente? Fico feliz em atender através dos canais abaixo:
+              <h3 className="text-2xl font-semibold mb-4">Contato</h3>
+              <p className="text-neutral-400 mb-6">
+                Prefere outro canal? Use email ou telefone abaixo.
               </p>
             </div>
 
             <div className="space-y-6">
-              {/* Email */}
-              <div className="flex items-start gap-4 group">
-                <div className="flex-shrink-0 w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center group-hover:bg-primary-200 transition-colors">
-                  <Mail className="w-6 h-6 text-primary-600" />
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-lg bg-primary-700/10 flex items-center justify-center">
+                  <Mail className="w-5 h-5 text-primary-300" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-neutral-900 mb-1">Email</h4>
-                  <a
-                    href="mailto:contato@seusite.com"
-                    className="text-neutral-600 hover:text-primary-600 transition-colors"
-                  >
+                  <div className="font-medium">Email</div>
+                  <a href="mailto:contato@seusite.com" className="text-neutral-300 hover:text-white">
                     contato@seusite.com
                   </a>
-                  <p className="text-sm text-neutral-500 mt-1">
-                    Respondo em até 24h
-                  </p>
                 </div>
               </div>
 
-              {/* Telefone */}
-              <div className="flex items-start gap-4 group">
-                <div className="flex-shrink-0 w-12 h-12 bg-secondary-100 rounded-lg flex items-center justify-center group-hover:bg-secondary-200 transition-colors">
-                  <Phone className="w-6 h-6 text-secondary-600" />
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-lg bg-secondary-700/10 flex items-center justify-center">
+                  <Phone className="w-5 h-5 text-secondary-300" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-neutral-900 mb-1">Telefone</h4>
-                  <a
-                    href="tel:+5511999999999"
-                    className="text-neutral-600 hover:text-secondary-600 transition-colors"
-                  >
+                  <div className="font-medium">Telefone</div>
+                  <a href="tel:+5511999999999" className="text-neutral-300 hover:text-white">
                     +55 (11) 99999-9999
                   </a>
-                  <p className="text-sm text-neutral-500 mt-1">
-                    Seg à Sex, 9h às 18h
-                  </p>
                 </div>
               </div>
 
-              {/* Localização */}
-              <div className="flex items-start gap-4 group">
-                <div className="flex-shrink-0 w-12 h-12 bg-accent-blue/10 rounded-lg flex items-center justify-center group-hover:bg-accent-blue/20 transition-colors">
-                  <MapPin className="w-6 h-6 text-accent-blue" />
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-lg bg-accent-blue/10 flex items-center justify-center">
+                  <MapPin className="w-5 h-5 text-accent-blue" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-neutral-900 mb-1">Localização</h4>
-                  <p className="text-neutral-600">São Paulo, SP - Brasil</p>
-                  <p className="text-sm text-neutral-500 mt-1">
-                    Trabalho remotamente
-                  </p>
+                  <div className="font-medium">Localização</div>
+                  <div className="text-neutral-300">São Paulo, BR</div>
                 </div>
               </div>
             </div>
 
-            {/* Disponibilidade */}
-            <div className="bg-white p-6 rounded-xl border border-neutral-200">
-              <h4 className="font-semibold text-neutral-900 mb-3">
-                Status de Disponibilidade
-              </h4>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-green-600 font-medium">Disponível para novos projetos</span>
+            <div className="bg-neutral-800 p-4 rounded-lg border border-neutral-700">
+              <div className="flex items-center gap-3">
+                <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse" />
+                <div className="font-medium text-green-300">Disponível para projetos</div>
               </div>
-              <p className="text-sm text-neutral-500">
-                Posso começar em janeiro de 2025
-              </p>
+              <p className="text-sm text-neutral-400 mt-2">Início previsto: janeiro de 2025</p>
             </div>
           </div>
 
-          {/* Formulário de contato */}
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <h3 className="text-2xl font-semibold text-neutral-900 mb-6">
-              Envie uma Mensagem
-            </h3>
+          <div className="bg-neutral-800 rounded-2xl p-8 border border-neutral-700">
+            <h3 className="text-2xl font-semibold mb-4">Envie uma mensagem</h3>
 
             {submitStatus === 'success' && (
-              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                <div>
-                  <p className="text-green-800 font-medium">Mensagem enviada com sucesso!</p>
-                  <p className="text-green-600 text-sm">Responderei em breve.</p>
-                </div>
+              <div className="mb-4 p-3 bg-green-900/40 border border-green-700 rounded flex items-center gap-3">
+                <CheckCircle className="w-5 h-5 text-green-300" />
+                <div className="text-green-200">Mensagem enviada com sucesso!</div>
               </div>
             )}
 
             {submitStatus === 'error' && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-                <div>
-                  <p className="text-red-800 font-medium">Erro ao enviar mensagem</p>
-                  <p className="text-red-600 text-sm">Tente novamente ou use outro meio de contato.</p>
-                </div>
+              <div className="mb-4 p-3 bg-red-900/40 border border-red-700 rounded flex items-center gap-3">
+                <AlertCircle className="w-5 h-5 text-red-300" />
+                <div className="text-red-200">Erro ao enviar — tente novamente.</div>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Nome */}
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="name" className="label">
-                  Nome *
-                </label>
+                <label htmlFor="name" className="block text-sm font-medium mb-1">Nome *</label>
                 <input
-                  type="text"
                   id="name"
                   name="name"
                   value={formData.name}
-                  onChange={handleInputChange}
+                  onChange={handleChange}
                   className={cn(
-                    'input',
-                    errors.name && 'border-red-300 focus:border-red-500 focus:ring-red-500/20'
+                    'w-full rounded-md px-3 py-2 bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-500',
+                    errors.name && 'border-red-500 focus:ring-red-400'
                   )}
                   placeholder="Seu nome completo"
                   disabled={isSubmitting}
                 />
-                {errors.name && (
-                  <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-                )}
+                {errors.name && <p className="text-sm text-red-400 mt-1">{errors.name}</p>}
               </div>
 
-              {/* Email */}
               <div>
-                <label htmlFor="email" className="label">
-                  Email *
-                </label>
+                <label htmlFor="email" className="block text-sm font-medium mb-1">Email *</label>
                 <input
-                  type="email"
                   id="email"
                   name="email"
+                  type="email"
                   value={formData.email}
-                  onChange={handleInputChange}
+                  onChange={handleChange}
                   className={cn(
-                    'input',
-                    errors.email && 'border-red-300 focus:border-red-500 focus:ring-red-500/20'
+                    'w-full rounded-md px-3 py-2 bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-500',
+                    errors.email && 'border-red-500 focus:ring-red-400'
                   )}
                   placeholder="seu@email.com"
                   disabled={isSubmitting}
                 />
-                {errors.email && (
-                  <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-                )}
+                {errors.email && <p className="text-sm text-red-400 mt-1">{errors.email}</p>}
               </div>
 
-              {/* Mensagem */}
               <div>
-                <label htmlFor="message" className="label">
-                  Mensagem *
-                </label>
+                <label htmlFor="message" className="block text-sm font-medium mb-1">Mensagem *</label>
                 <textarea
                   id="message"
                   name="message"
-                  rows={6}
+                  rows={5}
                   value={formData.message}
-                  onChange={handleInputChange}
+                  onChange={handleChange}
                   className={cn(
-                    'textarea',
-                    errors.message && 'border-red-300 focus:border-red-500 focus:ring-red-500/20'
+                    'w-full rounded-md px-3 py-2 bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-500',
+                    errors.message && 'border-red-500 focus:ring-red-400'
                   )}
-                  placeholder="Conte-me sobre seu projeto, ideia ou como posso ajudá-lo..."
+                  placeholder="Como posso ajudar?"
                   disabled={isSubmitting}
                 />
-                {errors.message && (
-                  <p className="mt-1 text-sm text-red-600">{errors.message}</p>
-                )}
+                {errors.message && <p className="text-sm text-red-400 mt-1">{errors.message}</p>}
               </div>
 
-              {/* Botão de envio */}
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="btn btn-primary w-full group"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 bg-primary-600 hover:bg-primary-500 disabled:opacity-70 transition-colors"
               >
                 {isSubmitting ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white/80" />
                     Enviando...
                   </>
                 ) : (
                   <>
-                    Enviar Mensagem
-                    <Send className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                    Enviar mensagem
+                    <Send className="w-4 h-4" />
                   </>
                 )}
               </button>
-            </form>
 
-            <p className="text-sm text-neutral-500 mt-4 text-center">
-              * Campos obrigatórios
-            </p>
+              <p className="text-sm text-neutral-500 text-center">* Campos obrigatórios</p>
+            </form>
           </div>
         </div>
       </div>
