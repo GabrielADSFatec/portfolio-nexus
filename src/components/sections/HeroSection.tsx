@@ -12,8 +12,21 @@ export default function HeroSection() {
   const [carouselItems, setCarouselItems] = useState<CarouselItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [windowWidth, setWindowWidth] = useState(0);
 
   const supabase = createClient();
+
+  useEffect(() => {
+    // Atualizar largura da janela
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Carregar dados do Supabase
   useEffect(() => {
@@ -43,7 +56,7 @@ export default function HeroSection() {
               id: 'default',
               title: 'Desenvolvedor Full Stack',
               description: 'Especializado em criar soluções web modernas e escaláveis',
-              image_url: '/images/placeholder.png', // Caminho correto
+              image_url: '/images/placeholder.png',
               link_url: null,
               order_index: 0,
               is_active: true,
@@ -97,81 +110,15 @@ export default function HeroSection() {
     );
   }
 
-  // Error state
-  if (error) {
-    return (
-      <section className="relative h-screen flex items-center justify-center bg-gradient-to-br from-primary-600 via-primary-700 to-secondary-600">
-        <div className="container text-center text-white">
-          <div className="max-w-3xl mx-auto">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6">
-              Desenvolvedor Full Stack
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 opacity-90">
-              Criando soluções digitais inovadoras
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="#projetos"
-                className="btn btn-primary btn-lg inline-flex items-center gap-2 group"
-              >
-                Ver Projetos
-                <ChevronDown className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
-              </a>
-              <a
-                href="#contato"
-                className="btn btn-outline btn-lg border-white text-white hover:bg-white hover:text-primary-600"
-              >
-                Entre em Contato
-              </a>
-            </div>
-            <p className="text-sm opacity-60 mt-8">
-              {error} - Usando layout padrão
-            </p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  // Se não há itens (não deveria acontecer por causa do fallback)
-  if (carouselItems.length === 0) {
-    return (
-      <section className="relative h-screen flex items-center justify-center bg-gradient-to-br from-primary-600 via-primary-700 to-secondary-600">
-        <div className="container text-center text-white">
-          <div className="max-w-3xl mx-auto">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6">
-              Desenvolvedor Full Stack
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 opacity-90">
-              Criando soluções digitais inovadoras
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="#projetos"
-                className="btn btn-primary btn-lg inline-flex items-center gap-2 group"
-              >
-                Ver Projetos
-                <ChevronDown className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
-              </a>
-              <a
-                href="#contato"
-                className="btn btn-outline btn-lg border-white text-white hover:bg-white hover:text-primary-600"
-              >
-                Entre em Contato
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
   const currentItem = carouselItems[currentSlide];
 
+  // Ajustar posição dos botões baseado na largura da tela
+  const buttonPosition = windowWidth < 768 ? 'top-2/3' : 'top-1/2';
+
   return (
-    <section className="relative h-screen overflow-hidden">
+    <section className="relative h-screen overflow-hidden isolate carousel-container">
       {/* Background Image */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 contain-layout">
         <Image
           src={currentItem.image_url}
           alt={currentItem.title}
@@ -180,7 +127,6 @@ export default function HeroSection() {
           priority
           onError={(e) => {
             console.warn('Erro ao carregar imagem:', currentItem.image_url);
-            // Fallback para gradient se imagem não carregar
             const target = e.target as HTMLImageElement;
             target.style.display = 'none';
           }}
@@ -191,15 +137,17 @@ export default function HeroSection() {
       {/* Content */}
       <div className="relative z-10 h-full flex items-center">
         <div className="container">
-          <div className="max-w-3xl">
+          <div className="max-w-3xl mx-4 md:mx-auto">
             <div className="animate-fade-in">
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 drop-shadow-2xl [text-shadow:_0_4px_12px_rgb(0_0_0_/_80%)]">
                 {currentItem.title}
               </h1>
               {currentItem.description && (
-                <p className="text-xl md:text-2xl text-white/95 mb-8 leading-relaxed drop-shadow-lg [text-shadow:_0_2px_8px_rgb(0_0_0_/_60%)] bg-black/20 backdrop-blur-sm rounded-lg p-4 border border-white/10">
-                  {currentItem.description}
-                </p>
+                <div className="relative mb-8">
+                  <p className="text-xl md:text-2xl text-white/95 leading-relaxed drop-shadow-lg [text-shadow:_0_2px_8px_rgb(0_0_0_/_60%)] bg-black/20 backdrop-blur-sm rounded-lg p-4 border border-white/10 pr-10 md:pr-4">
+                    {currentItem.description}
+                  </p>
+                </div>
               )}
               <div className="flex flex-col sm:flex-row gap-4">
                 <a
@@ -227,18 +175,26 @@ export default function HeroSection() {
           {/* Previous/Next Buttons */}
           <button
             onClick={prevSlide}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 p-3 rounded-full bg-black/40 backdrop-blur-md hover:bg-black/60 transition-all duration-200 text-white hover:scale-110 border border-white/20 shadow-lg"
+            className={cn(
+              "absolute left-2 z-20 p-2 rounded-full bg-black/40 backdrop-blur-md hover:bg-black/60 transition-all duration-200 text-white hover:scale-110 border border-white/20 shadow-lg md:left-4",
+              buttonPosition,
+              "transform -translate-y-1/2"
+            )}
             aria-label="Slide anterior"
           >
-            <ChevronLeft className="w-6 h-6 drop-shadow-sm" />
+            <ChevronLeft className="w-4 h-4 md:w-5 md:h-5 drop-shadow-sm" />
           </button>
 
           <button
             onClick={nextSlide}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 p-3 rounded-full bg-black/40 backdrop-blur-md hover:bg-black/60 transition-all duration-200 text-white hover:scale-110 border border-white/20 shadow-lg"
+            className={cn(
+              "absolute right-2 z-20 p-2 rounded-full bg-black/40 backdrop-blur-md hover:bg-black/60 transition-all duration-200 text-white hover:scale-110 border border-white/20 shadow-lg md:right-4",
+              buttonPosition,
+              "transform -translate-y-1/2"
+            )}
             aria-label="Próximo slide"
           >
-            <ChevronRight className="w-6 h-6 drop-shadow-sm" />
+            <ChevronRight className="w-4 h-4 md:w-5 md:h-5 drop-shadow-sm" />
           </button>
 
           {/* Slide Indicators */}
@@ -248,7 +204,7 @@ export default function HeroSection() {
                 key={index}
                 onClick={() => goToSlide(index)}
                 className={cn(
-                  'w-3 h-3 rounded-full transition-all duration-300 shadow-sm',
+                  'w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 shadow-sm',
                   index === currentSlide
                     ? 'bg-white scale-125 shadow-white/50'
                     : 'bg-white/60 hover:bg-white/80'
@@ -261,9 +217,9 @@ export default function HeroSection() {
       )}
 
       {/* Scroll Indicator */}
-      <div className="absolute bottom-8 right-8 z-20 animate-bounce-gentle">
-        <div className="w-6 h-10 border-2 border-white/60 rounded-full flex justify-center">
-          <div className="w-1 h-3 bg-white/60 rounded-full mt-2 animate-pulse"></div>
+      <div className="absolute bottom-8 right-4 z-20 animate-bounce-gentle md:right-8">
+        <div className="w-5 h-8 border-2 border-white/60 rounded-full flex justify-center">
+          <div className="w-1 h-2 bg-white/60 rounded-full mt-2 animate-pulse"></div>
         </div>
       </div>
     </section>

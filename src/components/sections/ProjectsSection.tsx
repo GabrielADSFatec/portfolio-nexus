@@ -5,96 +5,56 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ExternalLink, Github, Eye } from 'lucide-react';
 import { Project } from '@/types/database';
+import { createClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
-
-// Mock data - será substituído pela chamada ao Supabase
-const mockProjects: Project[] = [
-  {
-    id: '1',
-    title: 'E-commerce Moderno',
-    description: 'Plataforma completa de vendas online com dashboard administrativo, sistema de pagamentos integrado e gestão de estoque.',
-    full_description: 'Descrição completa do projeto...',
-    image_url: '/images/placeholder.png',
-    technologies: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Prisma', 'PostgreSQL'],
-    github_url: 'https://github.com/usuario/ecommerce',
-    live_url: 'https://ecommerce-demo.com',
-    order_index: 0,
-    is_featured: true,
-    is_active: true,
-    slug: 'ecommerce-moderno',
-    created_at: '2024-01-01',
-  },
-  {
-    id: '2',
-    title: 'App de Gestão Financeira',
-    description: 'Aplicativo para controle de finanças pessoais com relatórios detalhados, gráficos interativos e metas de economia.',
-    full_description: 'Descrição completa do projeto...',
-    image_url: '/images/placeholder.png',
-    technologies: ['React Native', 'Node.js', 'MongoDB', 'Chart.js'],
-    github_url: 'https://github.com/usuario/financas-app',
-    live_url: null,
-    order_index: 1,
-    is_featured: true,
-    is_active: true,
-    slug: 'gestao-financeira',
-    created_at: '2024-01-01',
-  },
-  {
-    id: '3',
-    title: 'Sistema de Reservas',
-    description: 'Plataforma para agendamento e gestão de reservas online com calendário interativo e notificações automáticas.',
-    full_description: 'Descrição completa do projeto...',
-    image_url: '/images/placeholder.png',
-    technologies: ['Vue.js', 'Express.js', 'MySQL', 'Socket.io'],
-    github_url: 'https://github.com/usuario/reservas',
-    live_url: 'https://reservas-demo.com',
-    order_index: 2,
-    is_featured: false,
-    is_active: true,
-    slug: 'sistema-reservas',
-    created_at: '2024-01-01',
-  },
-  {
-    id: '4',
-    title: 'Blog Pessoal',
-    description: 'Blog desenvolvido com foco em performance e SEO, com sistema de comentários e newsletter.',
-    full_description: 'Descrição completa do projeto...',
-    image_url: '/images/placeholder.png',
-    technologies: ['Gatsby', 'GraphQL', 'Contentful', 'Styled Components'],
-    github_url: 'https://github.com/usuario/blog',
-    live_url: 'https://meu-blog.com',
-    order_index: 3,
-    is_featured: false,
-    is_active: true,
-    slug: 'blog-pessoal',
-    created_at: '2024-01-01',
-  },
-];
 
 export default function ProjectsSection() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'featured'>('all');
+  const [error, setError] = useState<string | null>(null);
 
-  // Simular carregamento de dados do Supabase
+  const supabase = createClient();
+
+  // Carregar dados do Supabase
   useEffect(() => {
     const loadProjectsData = async () => {
       setIsLoading(true);
-      // TODO: Substituir por chamada real ao Supabase
-      // const { data, error } = await supabase
-      //   .from('projects')
-      //   .select('*')
-      //   .eq('is_active', true)
-      //   .order('order_index', { ascending: true });
-      
-      setTimeout(() => {
-        setProjects(mockProjects);
+      setError(null);
+
+      try {
+        let query = supabase
+          .from('projects')
+          .select('*')
+          .eq('is_active', true)
+          .order('order_index', { ascending: true });
+
+        // Se o filtro for 'featured', adicionar condição
+        if (filter === 'featured') {
+          query = query.eq('is_featured', true);
+        }
+
+        const { data, error: supabaseError } = await query;
+
+        if (supabaseError) {
+          console.error('Erro ao carregar projetos:', supabaseError);
+          setError('Erro ao carregar projetos');
+          return;
+        }
+
+        if (data) {
+          setProjects(data);
+        }
+      } catch (err) {
+        console.error('Erro inesperado:', err);
+        setError('Erro inesperado ao carregar projetos');
+      } finally {
         setIsLoading(false);
-      }, 1000);
+      }
     };
 
     loadProjectsData();
-  }, []);
+  }, [supabase, filter]); // Adicionei filter como dependência
 
   const filteredProjects = filter === 'featured' 
     ? projects.filter(project => project.is_featured)
@@ -151,23 +111,49 @@ export default function ProjectsSection() {
           </div>
         </div>
 
+        {/* Mensagem de erro */}
+        {error && (
+          <div className="text-center py-8 bg-red-50 rounded-lg mb-8">
+            <p className="text-red-600">{error}</p>
+            <p className="text-sm text-red-500 mt-2">
+              Verifique sua conexão com a internet e tente novamente.
+            </p>
+          </div>
+        )}
+
         {/* Grid de projetos */}
         {filteredProjects.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-xl text-neutral-500">Nenhum projeto encontrado.</p>
+            <p className="text-xl text-neutral-500">
+              {filter === 'featured' 
+                ? 'Nenhum projeto em destaque encontrado.' 
+                : 'Nenhum projeto encontrado.'
+              }
+            </p>
+            <p className="text-neutral-400 mt-2">
+              {filter === 'featured' 
+                ? 'Tente visualizar todos os projetos.' 
+                : 'Verifique se há projetos ativos no banco de dados.'
+              }
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredProjects.map((project) => (
               <div key={project.id} className="group">
-                <div className="card-hover p-0 overflow-hidden h-full flex flex-col">
+                <div className="card-hover p-0 overflow-hidden h-full flex flex-col bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300">
                   {/* Imagem do projeto */}
                   <div className="relative aspect-video overflow-hidden">
                     <Image
-                      src={project.image_url}
+                      src={project.image_url || '/images/placeholder-project.png'}
                       alt={project.title}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        console.warn('Erro ao carregar imagem do projeto:', project.image_url);
+                        const target = e.target as HTMLImageElement;
+                        target.src = '/images/placeholder-project.png';
+                      }}
                     />
                     {project.is_featured && (
                       <div className="absolute top-4 left-4 bg-primary-600 text-white px-3 py-1 rounded-full text-sm font-medium">
@@ -223,7 +209,7 @@ export default function ProjectsSection() {
 
                     {/* Tecnologias */}
                     <div className="flex flex-wrap gap-2 mb-6">
-                      {project.technologies.slice(0, 3).map((tech) => (
+                      {project.technologies?.slice(0, 3).map((tech) => (
                         <span
                           key={tech}
                           className="px-3 py-1 bg-primary-50 text-primary-700 rounded-full text-sm font-medium"
@@ -231,7 +217,7 @@ export default function ProjectsSection() {
                           {tech}
                         </span>
                       ))}
-                      {project.technologies.length > 3 && (
+                      {project.technologies && project.technologies.length > 3 && (
                         <span className="px-3 py-1 bg-neutral-100 text-neutral-600 rounded-full text-sm font-medium">
                           +{project.technologies.length - 3}
                         </span>
@@ -241,7 +227,7 @@ export default function ProjectsSection() {
                     {/* Botão Ver Mais */}
                     <Link
                       href={`/projeto/${project.slug}`}
-                      className="btn btn-outline w-full group/btn"
+                      className="btn btn-outline w-full group/btn mt-auto"
                     >
                       Ver Mais
                       <ExternalLink className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />

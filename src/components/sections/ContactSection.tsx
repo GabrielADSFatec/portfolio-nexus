@@ -1,9 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle } from 'lucide-react';
 import { ContactFormData } from '@/types/database';
+import { createClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
+
+interface CompanyInfo {
+  key: string;
+  value: string;
+  label: string;
+  type: string;
+}
 
 export default function ContactSection() {
   const [formData, setFormData] = useState<ContactFormData>({
@@ -14,6 +22,49 @@ export default function ContactSection() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errors, setErrors] = useState<Partial<ContactFormData>>({});
+  const [companyInfo, setCompanyInfo] = useState<Record<string, CompanyInfo>>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [infoError, setInfoError] = useState<string | null>(null);
+
+  const supabase = createClient();
+
+  // Carregar informações da empresa do Supabase
+  useEffect(() => {
+    const loadCompanyInfo = async () => {
+      setIsLoading(true);
+      setInfoError(null);
+
+      try {
+        const { data, error: supabaseError } = await supabase
+          .from('company_info')
+          .select('key, value, label, type')
+          .eq('is_active', true)
+          .order('display_order', { ascending: true });
+
+        if (supabaseError) {
+          console.error('Erro ao carregar informações da empresa:', supabaseError);
+          setInfoError('Erro ao carregar informações de contato');
+          return;
+        }
+
+        if (data) {
+          // Transformar array em objeto com chaves
+          const infoMap: Record<string, CompanyInfo> = {};
+          data.forEach(item => {
+            infoMap[item.key] = item;
+          });
+          setCompanyInfo(infoMap);
+        }
+      } catch (err) {
+        console.error('Erro inesperado:', err);
+        setInfoError('Erro inesperado ao carregar informações');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadCompanyInfo();
+  }, [supabase]);
 
   const validate = (): boolean => {
     const e: Partial<ContactFormData> = {};
@@ -27,7 +78,6 @@ export default function ContactSection() {
     return Object.keys(e).length === 0;
   };
 
-  // implementação alternativa ao fetch direto para reduzir similaridade com outras bases
   async function sendContact(payload: ContactFormData) {
     const controller = new AbortController();
     const timestamp = new Date().toISOString();
@@ -43,13 +93,11 @@ export default function ContactSection() {
         signal: controller.signal,
       });
 
-      // trata respostas não-ok de forma explícita
       if (!response.ok) {
         const text = await response.text().catch(() => '');
         throw new Error(text || `HTTP ${response.status}`);
       }
 
-      // tenta parsear JSON, mas aceita corpo vazio
       const data = await response.json().catch(() => null);
       return data;
     } finally {
@@ -107,38 +155,69 @@ export default function ContactSection() {
               </p>
             </div>
 
+            {/* Mensagem de erro ao carregar informações */}
+            {infoError && (
+              <div className="bg-red-900/40 border border-red-700 rounded-lg p-4">
+                <p className="text-red-200">{infoError}</p>
+                <p className="text-sm text-red-300 mt-2">Usando informações padrão</p>
+              </div>
+            )}
+
             <div className="space-y-6">
+              {/* Email */}
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-lg bg-primary-700/10 flex items-center justify-center">
                   <Mail className="w-5 h-5 text-primary-300" />
                 </div>
                 <div>
                   <div className="font-medium">Email</div>
-                  <a href="mailto:contato@seusite.com" className="text-neutral-300 hover:text-white">
-                    contato@seusite.com
-                  </a>
+                  {isLoading ? (
+                    <div className="h-5 bg-neutral-700 rounded animate-pulse w-40"></div>
+                  ) : (
+                    <a
+                      href={`mailto:${companyInfo.contact_email?.value || 'contato@seusite.com'}`}
+                      className="text-neutral-300 hover:text-white"
+                    >
+                      {companyInfo.contact_email?.value || 'contato@seusite.com'}
+                    </a>
+                  )}
                 </div>
               </div>
 
+              {/* Telefone */}
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-lg bg-secondary-700/10 flex items-center justify-center">
                   <Phone className="w-5 h-5 text-secondary-300" />
                 </div>
                 <div>
                   <div className="font-medium">Telefone</div>
-                  <a href="tel:+5511999999999" className="text-neutral-300 hover:text-white">
-                    +55 (11) 99999-9999
-                  </a>
+                  {isLoading ? (
+                    <div className="h-5 bg-neutral-700 rounded animate-pulse w-40"></div>
+                  ) : (
+                    <a
+                      href={`tel:${companyInfo.contact_phone?.value || '+5511999999999'}`}
+                      className="text-neutral-300 hover:text-white"
+                    >
+                      {companyInfo.contact_phone?.value || '+55 (11) 99999-9999'}
+                    </a>
+                  )}
                 </div>
               </div>
 
+              {/* Localização */}
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-lg bg-accent-blue/10 flex items-center justify-center">
                   <MapPin className="w-5 h-5 text-accent-blue" />
                 </div>
                 <div>
                   <div className="font-medium">Localização</div>
-                  <div className="text-neutral-300">São Paulo, BR</div>
+                  {isLoading ? (
+                    <div className="h-5 bg-neutral-700 rounded animate-pulse w-40"></div>
+                  ) : (
+                    <div className="text-neutral-300">
+                      {companyInfo.address?.value || 'São Paulo, BR'}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -148,7 +227,7 @@ export default function ContactSection() {
                 <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse" />
                 <div className="font-medium text-green-300">Disponível para projetos</div>
               </div>
-              <p className="text-sm text-neutral-400 mt-2">Início previsto: janeiro de 2025</p>
+              <p className="text-sm text-neutral-400 mt-2">Entre em contato</p>
             </div>
           </div>
 

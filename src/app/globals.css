@@ -46,6 +46,45 @@
   }
 }
 
+/* Prevenir overflow horizontal */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
+}
+
+* {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+/* Containment para prevenir conflitos de layout */
+.layout-container {
+  contain: layout;
+}
+
+/* Melhorias para mobile */
+@media (max-width: 768px) {
+  body {
+    position: relative;
+    width: 100vw;
+  }
+}
+
+/* Estilos para o carrossel - prevenir overflow */
+.carousel-container {
+  max-width: 100vw;
+  overflow: hidden;
+}
+
+.contain-layout {
+  contain: layout;
+}
+
+.isolate {
+  isolation: isolate;
+}
+
 /* Estilos base */
 @layer base {
   html {
@@ -314,5 +353,23 @@
   body.admin-dashboard-footer-right footer {
     padding-left: 16rem; /* corresponde a w-64 do sidebar */
     box-sizing: border-box;
+  }
+}
+
+/* Transições suaves para o menu mobile */
+.mobile-menu-transition {
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+/* Garantir que o body não tenha scroll quando o menu está aberto */
+body.menu-open {
+  overflow: hidden;
+}
+
+/* Melhorias para dispositivos móveis */
+@media (max-width: 768px) {
+  /* Garantir que o menu ocupe a tela toda */
+  .mobile-menu-fullscreen {
+    height: calc(100vh - 64px) !important;
   }
 }

@@ -10,7 +10,7 @@ export default function Footer() {
 
   const socialLinks = [
     {
-      href: 'https://github.com/seuusuario',
+      href: 'https://github.com/FatecEJ',
       Icon: Github,
       title: 'GitHub',
     },
@@ -20,7 +20,7 @@ export default function Footer() {
       title: 'LinkedIn',
     },
     {
-      href: 'mailto:contato@seusite.com',
+      href: 'empreendefatecej@gmail.com',
       Icon: Mail,
       title: 'Email',
     },
@@ -39,11 +39,16 @@ export default function Footer() {
               className="group inline-flex items-center gap-3 hover:opacity-90 transition-opacity"
             >
               <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-xl shadow-primary-500/20 group-hover:shadow-primary-500/30 transition-all">
-                {siteConfig.name.charAt(0)}
+                <Image
+                                            src="/logo-nexus.png"
+                                            alt="Logo da empresa"
+                                            width={50}
+                                            height={50}
+                                          />
               </div>
               <div className="text-left">
                 <h3 className="text-xl font-bold text-white">{siteConfig.name}</h3>
-                <p className="text-sm text-primary-300">Desenvolvedor Full Stack</p>
+                <p className="text-sm text-primary-300">Escritório de projetos</p>
               </div>
             </Link>
 
@@ -99,17 +104,10 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a
-                  href="tel:+5511999999999"
-                  className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2"
-                >
-                  <span>📱</span>
-                  +55 (11) 99999-9999
-                </a>
               </li>
               <li className="text-neutral-400 flex items-center gap-2">
                 <span>📍</span>
-                São Paulo, SP - Brasil
+                Itu, SP - Brasil
               </li>
               <li>
                 <div className="flex items-center gap-2 bg-green-500/10 p-3 rounded-lg border border-green-500/20">
@@ -134,7 +132,7 @@ export default function Footer() {
                 height={20}
               />
               <span>© {currentYear} Feito por {siteConfig.name}.</span>
-              <span>e Fatec Itu</span>
+              <span>e Fatec Itu - Todos os direitos reservados</span>
             </div>
 
             <div className="flex items-center gap-6">
@@ -145,7 +143,7 @@ export default function Footer() {
                 Termos
               </Link>
               <span className="text-neutral-800">•</span>
-              <span className="text-neutral-700">Next.js • Supabase • Tailwind CSS</span>
+              <span className="text-neutral-700">Vem ser FATEC!</span>
             </div>
           </div>
         </div>

@@ -5,95 +5,48 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
 import { Client } from '@/types/database';
+import { createClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
-
-// Mock data - será substituído pela chamada ao Supabase
-const mockClients: Client[] = [
-  {
-    id: '1',
-    name: 'TechCorp Solutions',
-    logo_url: '/images/placeholder.png', // atualizado
-    website_url: 'https://techcorp.com',
-    description: 'Empresa de tecnologia focada em soluções empresariais',
-    order_index: 0,
-    is_active: true,
-    created_at: '2024-01-01',
-  },
-  {
-    id: '2',
-    name: 'StartupXYZ',
-    logo_url: '/images/placeholder.png', // atualizado
-    website_url: 'https://startupxyz.com',
-    description: 'Startup inovadora no setor de fintech',
-    order_index: 1,
-    is_active: true,
-    created_at: '2024-01-01',
-  },
-  {
-    id: '3',
-    name: 'Digital Agency',
-    logo_url: '/images/placeholder.png', // atualizado
-    website_url: 'https://digitalagency.com',
-    description: 'Agência digital especializada em marketing online',
-    order_index: 2,
-    is_active: true,
-    created_at: '2024-01-01',
-  },
-  {
-    id: '4',
-    name: 'E-commerce Plus',
-    logo_url: '/images/placeholder.png', // atualizado
-    website_url: 'https://ecommerceplus.com',
-    description: 'Plataforma de e-commerce para pequenas empresas',
-    order_index: 3,
-    is_active: true,
-    created_at: '2024-01-01',
-  },
-  {
-    id: '5',
-    name: 'HealthTech',
-    logo_url: '/images/placeholder.png', // atualizado
-    website_url: 'https://healthtech.com',
-    description: 'Tecnologia aplicada à área da saúde',
-    order_index: 4,
-    is_active: true,
-    created_at: '2024-01-01',
-  },
-  {
-    id: '6',
-    name: 'EduPlatform',
-    logo_url: '/images/placeholder.png', // atualizado
-    website_url: 'https://eduplatform.com',
-    description: 'Plataforma educacional online',
-    order_index: 5,
-    is_active: true,
-    created_at: '2024-01-01',
-  },
-];
 
 export default function ClientsSection() {
   const [clients, setClients] = useState<Client[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Simular carregamento de dados do Supabase
+  const supabase = createClient();
+
+  // Carregar dados do Supabase
   useEffect(() => {
     const loadClientsData = async () => {
       setIsLoading(true);
-      // TODO: Substituir por chamada real ao Supabase
-      // const { data, error } = await supabase
-      //   .from('clients')
-      //   .select('*')
-      //   .eq('is_active', true)
-      //   .order('order_index', { ascending: true });
-      
-      setTimeout(() => {
-        setClients(mockClients);
+      setError(null);
+
+      try {
+        const { data, error: supabaseError } = await supabase
+          .from('clients')
+          .select('*')
+          .eq('is_active', true)
+          .order('order_index', { ascending: true });
+
+        if (supabaseError) {
+          console.error('Erro ao carregar clientes:', supabaseError);
+          setError('Erro ao carregar clientes');
+          return;
+        }
+
+        if (data) {
+          setClients(data);
+        }
+      } catch (err) {
+        console.error('Erro inesperado:', err);
+        setError('Erro inesperado ao carregar clientes');
+      } finally {
         setIsLoading(false);
-      }, 1000);
+      }
     };
 
     loadClientsData();
-  }, []);
+  }, [supabase]);
 
   if (isLoading) {
     return (
@@ -120,9 +73,22 @@ export default function ClientsSection() {
           </p>
         </div>
 
+        {/* Mensagem de erro */}
+        {error && (
+          <div className="text-center py-8 bg-red-50 rounded-lg mb-8">
+            <p className="text-red-600">{error}</p>
+            <p className="text-sm text-red-500 mt-2">
+              Verifique sua conexão com a internet e tente novamente.
+            </p>
+          </div>
+        )}
+
         {clients.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-xl text-neutral-500">Nenhum cliente cadastrado.</p>
+            <p className="text-neutral-400 mt-2">
+              Verifique se há clientes ativos no banco de dados.
+            </p>
           </div>
         ) : (
           <>
@@ -146,10 +112,15 @@ export default function ClientsSection() {
                       title={`Visitar ${client.name}`}
                     >
                       <Image
-                        src={client.logo_url}
+                        src={client.logo_url || '/images/placeholder.png'}
                         alt={`Logo ${client.name}`}
                         fill
                         className="object-contain p-4 filter grayscale group-hover:grayscale-0 transition-all duration-300 group-hover/link:scale-110"
+                        onError={(e) => {
+                          console.warn('Erro ao carregar logo do cliente:', client.logo_url);
+                          const target = e.target as HTMLImageElement;
+                          target.src = '/images/placeholder.png';
+                        }}
                       />
                       <div className="absolute inset-0 bg-primary-600/0 group-hover/link:bg-primary-600/5 rounded-xl transition-all duration-300" />
                       <ExternalLink className="absolute top-2 right-2 w-4 h-4 text-neutral-400 opacity-0 group-hover/link:opacity-100 transition-opacity" />
@@ -157,20 +128,27 @@ export default function ClientsSection() {
                   ) : (
                     <div className="relative w-full h-full flex items-center justify-center">
                       <Image
-                        src={client.logo_url}
+                        src={client.logo_url || '/images/placeholder.png'}
                         alt={`Logo ${client.name}`}
                         fill
                         className="object-contain p-4 filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                        onError={(e) => {
+                          console.warn('Erro ao carregar logo do cliente:', client.logo_url);
+                          const target = e.target as HTMLImageElement;
+                          target.src = '/images/placeholder.png';
+                        }}
                       />
                     </div>
                   )}
 
-                  {/* Tooltip com nome e descrição */}
+                  {/* Tooltip com nome e descrição - CORRIGIDO */}
                   {client.description && (
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-10">
-                      <div className="bg-neutral-900 text-white text-sm rounded-lg px-3 py-2 whitespace-nowrap max-w-xs">
-                        <div className="font-semibold">{client.name}</div>
-                        <div className="text-neutral-300 text-xs mt-1">{client.description}</div>
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-10 w-64">
+                      <div className="bg-neutral-900 text-white text-sm rounded-lg p-3 whitespace-normal break-words">
+                        <div className="font-semibold mb-1">{client.name}</div>
+                        <div className="text-neutral-300 text-xs leading-relaxed">
+                          {client.description}
+                        </div>
                         <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-neutral-900"></div>
                       </div>
                     </div>

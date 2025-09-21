@@ -60,7 +60,7 @@ export const adminNavigation = [
 export const socialLinks = [
   {
     name: 'GitHub',
-    href: 'https://github.com/seuusuario',
+    href: 'https://github.com/FatecEJ',
     icon: 'Github',
   },
   {
@@ -70,7 +70,7 @@ export const socialLinks = [
   },
   {
     name: 'Email',
-    href: 'mailto:seu@email.com',
+    href: 'mailto:empreendefatecej@gmail.com',
     icon: 'Mail',
   },
 ] as const;
@@ -78,8 +78,8 @@ export const socialLinks = [
 // Configurações do site
 export const siteConfig = {
   name: 'NexusJr',
-  title: 'Desenvolvedor Full Stack',
-  description: 'Desenvolvedor especializado em React, Next.js e Node.js',
+  title: 'Escritório de Projetos - NexusJr',
+  description: 'Escritório de projetos da Fatec Itu - NexusJr',
   url: 'https://seusite.com',
   keywords: [
     'desenvolvedor',
