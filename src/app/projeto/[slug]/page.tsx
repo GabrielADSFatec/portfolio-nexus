@@ -302,7 +302,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 Outros Projetos
               </h2>
               <p className="text-xl text-neutral-700 max-w-2xl mx-auto">
-                Confira outros trabalhos que desenvolvi
+                Confira outros trabalhos desenvolvidos!
               </p>
               <div className="w-24 h-1 bg-gradient-to-r from-emerald-600 to-teal-600 mx-auto rounded-full mt-6"></div>
             </div>
