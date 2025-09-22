@@ -90,6 +90,9 @@ export const siteConfig = {
     'javascript',
     'typescript',
     'portfolio',
+    'fatec',
+    'itu',
+    'nexus',
   ],
 } as const;
 

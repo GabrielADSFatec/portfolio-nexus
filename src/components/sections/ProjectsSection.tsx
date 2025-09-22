@@ -54,7 +54,7 @@ export default function ProjectsSection() {
     };
 
     loadProjectsData();
-  }, [supabase, filter]); // Adicionei filter como dependência
+  }, [supabase, filter]);
 
   const filteredProjects = filter === 'featured' 
     ? projects.filter(project => project.is_featured)
@@ -78,21 +78,21 @@ export default function ProjectsSection() {
         {/* Header da seção */}
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-neutral-900 mb-6">
-            Meus <span className="gradient-text">Projetos</span>
+            Nossos <span className="gradient-text">Projetos</span>
           </h2>
           <p className="text-xl text-neutral-600 max-w-3xl mx-auto mb-8">
-            Uma seleção dos projetos que desenvolvi, demonstrando diferentes tecnologias e abordagens de desenvolvimento.
+            Uma seleção dos projetos desenvolvidos, demonstrando diferentes áreas de atuação.
           </p>
 
-          {/* Filtros */}
+          {/* Filtros - CORES CORRIGIDAS */}
           <div className="flex justify-center gap-4">
             <button
               onClick={() => setFilter('all')}
               className={cn(
                 'px-6 py-3 rounded-lg font-medium transition-all duration-200',
                 filter === 'all'
-                  ? 'bg-primary-600 text-white shadow-md'
-                  : 'bg-white text-neutral-600 hover:bg-neutral-100 border border-neutral-200'
+                  ? 'bg-neutral-800 text-white shadow-md hover:bg-neutral-700'
+                  : 'bg-white text-neutral-700 hover:bg-neutral-100 border border-neutral-200'
               )}
             >
               Todos os Projetos
@@ -102,8 +102,8 @@ export default function ProjectsSection() {
               className={cn(
                 'px-6 py-3 rounded-lg font-medium transition-all duration-200',
                 filter === 'featured'
-                  ? 'bg-primary-600 text-white shadow-md'
-                  : 'bg-white text-neutral-600 hover:bg-neutral-100 border border-neutral-200'
+                  ? 'bg-neutral-800 text-white shadow-md hover:bg-neutral-700'
+                  : 'bg-white text-neutral-700 hover:bg-neutral-100 border border-neutral-200'
               )}
             >
               Projetos em Destaque
@@ -156,16 +156,16 @@ export default function ProjectsSection() {
                       }}
                     />
                     {project.is_featured && (
-                      <div className="absolute top-4 left-4 bg-primary-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+                      <div className="absolute top-4 left-4 bg-emerald-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
                         Destaque
                       </div>
                     )}
                     
                     {/* Overlay com links */}
-                    <div className="absolute inset-0 bg-primary-900/80 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-4">
+                    <div className="absolute inset-0 bg-neutral-900/80 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-4">
                       <Link
                         href={`/projeto/${project.slug}`}
-                        className="p-3 bg-white rounded-full text-primary-600 hover:bg-primary-50 transition-colors"
+                        className="p-3 bg-white rounded-full text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900 transition-colors shadow-lg"
                         title="Ver detalhes do projeto"
                       >
                         <Eye className="w-5 h-5" />
@@ -176,7 +176,7 @@ export default function ProjectsSection() {
                           href={project.github_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-3 bg-white rounded-full text-primary-600 hover:bg-primary-50 transition-colors"
+                          className="p-3 bg-white rounded-full text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900 transition-colors shadow-lg"
                           title="Ver código no GitHub"
                         >
                           <Github className="w-5 h-5" />
@@ -188,7 +188,7 @@ export default function ProjectsSection() {
                           href={project.live_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-3 bg-white rounded-full text-primary-600 hover:bg-primary-50 transition-colors"
+                          className="p-3 bg-white rounded-full text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900 transition-colors shadow-lg"
                           title="Ver projeto online"
                         >
                           <ExternalLink className="w-5 h-5" />
@@ -199,7 +199,7 @@ export default function ProjectsSection() {
 
                   {/* Conteúdo do card */}
                   <div className="p-6 flex-1 flex flex-col">
-                    <h3 className="text-xl font-semibold text-neutral-900 mb-3 group-hover:text-primary-600 transition-colors">
+                    <h3 className="text-xl font-semibold text-neutral-900 mb-3 group-hover:text-neutral-700 transition-colors">
                       {project.title}
                     </h3>
                     
@@ -207,27 +207,27 @@ export default function ProjectsSection() {
                       {project.description}
                     </p>
 
-                    {/* Tecnologias */}
+                    {/* Tecnologias - CORES CORRIGIDAS */}
                     <div className="flex flex-wrap gap-2 mb-6">
                       {project.technologies?.slice(0, 3).map((tech) => (
                         <span
                           key={tech}
-                          className="px-3 py-1 bg-primary-50 text-primary-700 rounded-full text-sm font-medium"
+                          className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium border border-blue-200"
                         >
                           {tech}
                         </span>
                       ))}
                       {project.technologies && project.technologies.length > 3 && (
-                        <span className="px-3 py-1 bg-neutral-100 text-neutral-600 rounded-full text-sm font-medium">
+                        <span className="px-3 py-1 bg-neutral-200 text-neutral-700 rounded-full text-sm font-medium border border-neutral-300">
                           +{project.technologies.length - 3}
                         </span>
                       )}
                     </div>
 
-                    {/* Botão Ver Mais */}
+                    {/* Botão Ver Mais - CORES CORRIGIDAS */}
                     <Link
                       href={`/projeto/${project.slug}`}
-                      className="btn btn-outline w-full group/btn mt-auto"
+                      className="inline-flex items-center justify-center px-4 py-3 bg-white border-2 border-neutral-800 text-neutral-800 rounded-lg font-medium hover:bg-neutral-800 hover:text-white transition-all duration-200 group/btn mt-auto"
                     >
                       Ver Mais
                       <ExternalLink className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
