@@ -13,8 +13,7 @@ import {
   Menu,
   X,
   Settings,
-  Home,
-  Bell
+  Home
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { adminNavigation, siteConfig } from '@/constants';
@@ -41,29 +40,14 @@ export default function AdminLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  // const supabase = createClient();
   const supabase = useMemo(() => createClient(), []);
   
-  // Marca o body apenas na rota /admin/dashboard para ajustar footer
   useEffect(() => {
-    const cls = 'admin-dashboard-footer-right';
-    if (typeof document === 'undefined') return;
-    if (pathname === '/admin/dashboard') {
-      document.body.classList.add(cls);
-    } else {
-      document.body.classList.remove(cls);
-    }
-    return () => document.body.classList.remove(cls);
-  }, [pathname]);
-  
-  useEffect(() => {
-    // Verificar usuário atual
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
       setLoading(false);
 
-      // Se não houver usuário, redirecionar para login
       if (!user) {
         router.push('/login');
       }
@@ -71,7 +55,6 @@ export default function AdminLayout({
 
     getUser();
 
-    // Escutar mudanças de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (event === 'SIGNED_OUT' || !session) {
@@ -88,9 +71,10 @@ export default function AdminLayout({
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await supabase.auth.signOut();
-      router.push('/login');
-      router.refresh();
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      window.location.href = '/login';
     } catch (error) {
       console.error('Erro no logout:', error);
     } finally {
@@ -98,19 +82,17 @@ export default function AdminLayout({
     }
   };
 
-  // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+      <div className="min-h-screen flex items-center justify-center bg-neutral-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-2 border-primary-600 border-t-transparent mx-auto mb-4"></div>
-          <p className="text-neutral-600">Carregando...</p>
+          <p className="text-neutral-400">Carregando...</p>
         </div>
       </div>
     );
   }
 
-  // Se não houver usuário, não renderizar nada (redirecionamento em andamento)
   if (!user) {
     return null;
   }
@@ -118,15 +100,18 @@ export default function AdminLayout({
   return (
     <div className="min-h-screen bg-neutral-900 text-white">
       {/* Sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-40 w-64 bg-neutral-800 border-r border-neutral-700">
+      <aside className={cn(
+        "fixed inset-y-0 left-0 z-40 w-64 bg-neutral-800 border-r border-neutral-700 transform transition-transform duration-300 ease-in-out lg:translate-x-0",
+        sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      )}>
         <div className="flex h-full flex-col">
-          {/* Header */}
+          {/* Header do Sidebar */}
           <div className="flex h-16 items-center justify-between px-6 border-b border-neutral-700">
             <Link
               href="/admin/dashboard"
               className="flex items-center space-x-3"
             >
-              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center text-white font-bold">
+              <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg flex items-center justify-center text-white font-bold">
                 {siteConfig.name.charAt(0)}
               </div>
               <div>
@@ -157,7 +142,7 @@ export default function AdminLayout({
                   className={cn(
                     'flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors',
                     isActive
-                      ? 'bg-primary-50 text-primary-700 border-r-2 border-primary-600'
+                      ? 'bg-primary-500/20 text-primary-300 border-r-2 border-primary-500'
                       : 'text-neutral-300 hover:bg-neutral-700 hover:text-white'
                   )}
                   onClick={() => setSidebarOpen(false)}
@@ -199,8 +184,8 @@ export default function AdminLayout({
           {/* User info & Logout */}
           <div className="p-4 border-t border-neutral-700">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
-                <span className="text-primary-600 font-medium text-sm">
+              <div className="w-10 h-10 bg-primary-500/20 rounded-full flex items-center justify-center">
+                <span className="text-primary-300 font-medium text-sm">
                   {user.email?.charAt(0).toUpperCase()}
                 </span>
               </div>
@@ -217,7 +202,7 @@ export default function AdminLayout({
             <button
               onClick={handleLogout}
               disabled={isLoggingOut}
-              className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-400 rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50"
+              className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-400 rounded-lg hover:bg-red-500/20 transition-colors disabled:opacity-50"
             >
               <LogOut className="w-4 h-4" />
               {isLoggingOut ? 'Saindo...' : 'Sair'}
@@ -226,53 +211,31 @@ export default function AdminLayout({
         </div>
       </aside>
 
-      {/* Main: reserva o espaço do sidebar em telas >= lg */}
-      <main className="flex-1 lg:ml-64">
-        {/* Top bar */}
-        <div className="sticky top-0 z-30 bg-neutral-800 shadow-sm border-b border-neutral-700 px-4 py-4 lg:px-8">
-          <div className="flex items-center justify-between">
-            {/* Mobile menu button */}
-            <button
-              className="lg:hidden p-2 rounded-lg hover:bg-neutral-700"
-              onClick={() => setSidebarOpen(true)}
-            >
-              <Menu className="w-6 h-6" />
-            </button>
+      {/* Main Content - SEM HEADER/TOP BAR */}
+      <main className="flex-1 lg:ml-64 min-h-screen">
+        {/* Botão de abrir menu mobile - aparece apenas quando sidebar está fechado em mobile */}
+        {!sidebarOpen && (
+          <button
+            className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-neutral-800 rounded-lg border border-neutral-700 hover:bg-neutral-700 transition-colors"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+        )}
 
-            {/* Page title */}
-            <div className="flex-1 lg:flex-none">
-              <h1 className="text-xl font-semibold text-neutral-100">
-                {adminNavigation.find(item => item.href === pathname)?.name || 'Admin'}
-              </h1>
-            </div>
-
-            {/* Top bar actions */}
-            <div className="flex items-center gap-4">
-              {/* Notifications */}
-              <button className="p-2 text-neutral-400 hover:text-neutral-600 hover:bg-neutral-700 rounded-lg transition-colors relative">
-                <Bell className="w-5 h-5" />
-                {/* Notification badge */}
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-              </button>
-
-              {/* Quick access to site */}
-              <Link
-                href="/"
-                target="_blank"
-                className="hidden sm:flex items-center gap-2 px-3 py-2 text-sm text-neutral-300 hover:text-neutral-900 hover:bg-neutral-700 rounded-lg transition-colors"
-              >
-                <Home className="w-4 h-4" />
-                Ver Site
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Page content */}
-        <div className="p-4 lg:p-8">
+        {/* Page content direto - sem top bar */}
+        <div className="p-6 lg:p-8 pt-16 lg:pt-8"> {/* pt-16 para dar espaço ao botão mobile */}
           {children}
         </div>
       </main>
+
+      {/* Overlay para mobile quando sidebar está aberto */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 z-30 bg-black/50 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
     </div>
   );
 }

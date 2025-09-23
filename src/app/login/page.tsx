@@ -50,9 +50,7 @@ export default function LoginPage() {
         const urlParams = new URLSearchParams(window.location.search);
         const redirectTo = urlParams.get('redirect') || '/admin/dashboard';
         
-        // Forçar refresh para atualizar o middleware
-        router.push(redirectTo);
-        router.refresh();
+        window.location.href = redirectTo;
       }
     } catch (err) {
       setError('Erro inesperado. Tente novamente.');

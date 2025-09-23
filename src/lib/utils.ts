@@ -1,89 +1,58 @@
-// lib/utils.ts
-import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
 
-// Função para combinar classes do Tailwind
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs))
 }
 
-// Função para formatar datas
-export function formatDate(date: string | Date) {
-  return new Date(date).toLocaleDateString('pt-BR', {
-    year: 'numeric',
-    month: 'long',
+export function formatDate(date: Date | string | null, locale: string = 'pt-BR'): string {
+  if (!date) return ''
+  
+  const dateObj = new Date(date)
+  if (isNaN(dateObj.getTime())) return ''
+  
+  return dateObj.toLocaleDateString(locale, {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  })
+}
+
+export function formatDateLong(date: Date | string | null, locale: string = 'pt-BR'): string {
+  if (!date) return ''
+  
+  const dateObj = new Date(date)
+  if (isNaN(dateObj.getTime())) return ''
+  
+  return dateObj.toLocaleDateString(locale, {
     day: 'numeric',
-  });
-}
-
-// Função para formatar data e hora
-export function formatDateTime(date: string | Date) {
-  return new Date(date).toLocaleDateString('pt-BR', {
-    year: 'numeric',
     month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+    year: 'numeric'
+  })
 }
 
-// Função para truncar texto
-export function truncateText(text: string, maxLength: number) {
-  if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength) + '...';
-}
-
-// Função para validar email
-export function isValidEmail(email: string) {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
-
-// Função para gerar slug a partir de texto
-export function generateSlug(text: string) {
+export function generateSlug(text: string): string {
   return text
-    .toLowerCase()
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '') // Remove acentos
-    .replace(/[^\w\s-]/g, '') // Remove caracteres especiais
-    .replace(/\s+/g, '-') // Substitui espaços por hífens
-    .replace(/-+/g, '-') // Remove hífens duplicados
-    .trim();
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]+/g, '')
+    .replace(/--+/g, '-')
 }
 
-// Função para converter arquivo para base64
-export function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = (error) => reject(error);
-  });
+export function stringToArray(str: string | string[] | null): string[] {
+  if (!str) return []
+  if (Array.isArray(str)) return str
+  return str.split(',').map(item => item.trim()).filter(Boolean)
 }
 
-// Função para validar URL
-export function isValidUrl(url: string) {
+export function isValidUrl(string: string): boolean {
   try {
-    new URL(url);
-    return true;
-  } catch {
-    return false;
+    new URL(string)
+    return true
+  } catch (_) {
+    return false
   }
-}
-
-// Função para debounce (corrigida)
-export function debounce<T extends (...args: unknown[]) => void>(
-  func: T,
-  wait: number
-): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout;
-  return (...args: Parameters<T>) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  };
-}
-
-// Função para delay
-export function delay(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
 }

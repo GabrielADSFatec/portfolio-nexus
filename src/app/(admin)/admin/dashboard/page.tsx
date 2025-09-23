@@ -7,14 +7,12 @@ import {
   Users, 
   Briefcase, 
   MessageSquare, 
-  TrendingUp, 
   Eye,
   Plus,
   Activity
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { cn } from '@/lib/utils';  // Add this import
-import type { Metadata } from 'next';
+import { cn } from '@/lib/utils';
 
 interface DashboardStats {
   totalProjects: number;
@@ -22,6 +20,17 @@ interface DashboardStats {
   totalClients: number;
   unreadMessages: number;
   carouselItems: number;
+}
+
+interface NextStep {
+  status: 'done' | 'pending';
+  title: string;
+  desc: string;
+}
+
+interface SiteRoute {
+  label: string;
+  value: string;
 }
 
 export default function DashboardPage() {
@@ -35,6 +44,20 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   const supabase = createClient();
+
+  // Definindo siteRoutes corretamente
+  const siteRoutes: SiteRoute[] = [
+    { label: 'Homepage', value: 'Carrossel + Projetos + Clientes' },
+    { label: 'Projeto Individual', value: '/projeto/[slug]' },
+    { label: 'Admin', value: '/admin (onde você está)' },
+  ];
+
+  const nextSteps: NextStep[] = [
+    { status: 'done', title: 'Sistema de autenticação', desc: 'Login e middleware funcionando' },
+    { status: 'done', title: 'Banco de dados', desc: 'Tabelas criadas e dados de exemplo' },
+    { status: 'pending', title: 'Páginas CRUD', desc: 'Criar interfaces para gerenciar conteúdo' },
+    { status: 'pending', title: 'Upload de imagens', desc: 'Sistema para upload de fotos dos projetos' },
+  ];
 
   useEffect(() => {
     const loadStats = async () => {
@@ -73,19 +96,6 @@ export default function DashboardPage() {
     loadStats();
   }, [supabase]);
 
-  const nextSteps = [
-    { status: 'done', title: 'Sistema de autenticação', desc: 'Login e middleware funcionando' },
-    { status: 'done', title: 'Banco de dados', desc: 'Tabelas criadas e dados de exemplo' },
-    { status: 'pending', title: 'Páginas CRUD', desc: 'Criar interfaces para gerenciar conteúdo' },
-    { status: 'pending', title: 'Upload de imagens', desc: 'Sistema para upload de fotos dos projetos' },
-  ];
-
-  const siteRoutes = [
-    { label: 'Homepage', value: 'Carrossel + Projetos + Clientes' },
-    { label: 'Projeto Individual', value: '/projeto/[slug]' },
-    { label: 'Admin', value: '/admin (onde você está)' },
-  ];
-
   if (loading) {
     return (
       <div className="min-h-screen bg-neutral-900 p-6 md:p-8">
@@ -103,7 +113,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-900 p-6 md:p-8 space-y-8">
+    <div className="min-h-screen bg-neutral-900 space-y-8">
       {/* Welcome Header */}
       <div className="bg-neutral-800/50 p-6 rounded-xl shadow-sm border border-neutral-700/50">
         <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 flex items-center gap-3">
@@ -147,8 +157,8 @@ export default function DashboardPage() {
               <div className="text-2xl font-bold text-neutral-900">{stats.totalClients}</div>
               <div className="text-sm text-neutral-500">ativos</div>
             </div>
-            <div className="w-12 h-12 bg-secondary-100 rounded-lg flex items-center justify-center">
-              <Users className="w-6 h-6 text-secondary-600" />
+            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+              <Users className="w-6 h-6 text-green-600" />
             </div>
           </div>
         </div>
@@ -164,8 +174,8 @@ export default function DashboardPage() {
               <div className="text-2xl font-bold text-neutral-900">{stats.unreadMessages}</div>
               <div className="text-sm text-neutral-500">não lidas</div>
             </div>
-            <div className="w-12 h-12 bg-accent-blue/10 rounded-lg flex items-center justify-center">
-              <MessageSquare className="w-6 h-6 text-accent-blue" />
+            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+              <MessageSquare className="w-6 h-6 text-blue-600" />
             </div>
           </div>
         </div>
@@ -181,15 +191,15 @@ export default function DashboardPage() {
               <div className="text-2xl font-bold text-neutral-900">{stats.carouselItems}</div>
               <div className="text-sm text-neutral-500">slides ativos</div>
             </div>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <BarChart3 className="w-6 h-6 text-green-600" />
+            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+              <BarChart3 className="w-6 h-6 text-purple-600" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Success Message */}
-      <div className="bg-gradient-primary rounded-xl p-6 text-white">
+      <div className="bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl p-6 text-white">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-semibold mb-1">🎉 Login realizado com sucesso!</h3>
