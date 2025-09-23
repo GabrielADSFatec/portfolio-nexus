@@ -1,4 +1,4 @@
-import { Metadata } from 'next';
+import { Metadata, Viewport } from 'next';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -79,6 +79,15 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
   };
 }
 
+// Generate viewport - CORREÇÃO CRÍTICA
+export async function generateViewport({ params }: ProjectPageProps): Promise<Viewport> {
+  return {
+    themeColor: '#3b82f6',
+    width: 'device-width',
+    initialScale: 1,
+  };
+}
+
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
   const project = await getProject(slug);
@@ -113,7 +122,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             <span className="text-neutral-800 font-semibold">{project.title}</span>
           </div>
 
-          {/* Back button - CORES CORRIGIDAS */}
+          {/* Back button */}
           <Link
             href="/#projetos"
             className="inline-flex items-center gap-2 text-white hover:text-neutral-100 font-semibold mb-8 group bg-neutral-800 hover:bg-neutral-700 px-6 py-3 rounded-lg shadow-md border border-neutral-600 hover:shadow-lg transition-all"
@@ -141,7 +150,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 {project.description}
               </p>
 
-              {/* Project Meta Cards - CORES CORRIGIDAS */}
+              {/* Project Meta Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral-200 hover:shadow-md transition-all">
                   <div className="flex items-center gap-3">
@@ -168,7 +177,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 </div>
               </div>
 
-              {/* Action Buttons - CORES CORRIGIDAS */}
+              {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
                 {project.live_url && (
                   <a
@@ -196,7 +205,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 )}
               </div>
 
-              {/* Technologies - CORES COMPLETAMENTE CORRIGIDAS */}
+              {/* Technologies */}
               <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral-200">
                 <h3 className="font-bold text-neutral-900 mb-4 flex items-center gap-2 text-lg">
                   <Tag className="w-5 h-5 text-neutral-700" />
@@ -248,7 +257,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         </div>
       </section>
 
-      {/* Project Details - CORES CORRIGIDAS */}
+      {/* Project Details */}
       <section className="py-20 bg-white">
         <div className="container">
           <div className="max-w-4xl mx-auto">
@@ -293,7 +302,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         </div>
       </section>
 
-      {/* Related Projects - CORES CORRIGIDAS */}
+      {/* Related Projects */}
       {relatedProjects.length > 0 && (
         <section className="py-20 bg-gradient-to-br from-neutral-50 to-blue-50/30">
           <div className="container">

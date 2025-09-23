@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next'; // Importe o tipo Viewport
 import { Inter } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/layout/header';
@@ -12,6 +12,7 @@ const inter = Inter({
   variable: '--font-inter',
 });
 
+// METADADOS (SEO, redes sociais, etc.)
 export const metadata: Metadata = {
   title: {
     default: siteConfig.name,
@@ -79,17 +80,27 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/',
   },
-  // Theme color para mobile
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#3b82f6' },
-    { media: '(prefers-color-scheme: dark)', color: '#1d4ed8' },
-  ],
   // Configuração para iOS
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
     title: siteConfig.name,
   },
+};
+
+// VIEWPORT (Configurações de visualização mobile/PWA)
+export const viewport: Viewport = {
+  // Substitui o themeColor que estava no metadata
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#3b82f6' },
+    { media: '(prefers-color-scheme: dark)', color: '#1d4ed8' },
+  ],
+  // Substitui a meta tag viewport manual
+  width: 'device-width',
+  initialScale: 1,
+  // Adicione outras propriedades se necessário, como:
+  // userScalable: 'no',
+  // interactiveWidget: 'resizes-visual',
 };
 
 export default function RootLayout({
@@ -105,9 +116,9 @@ export default function RootLayout({
         <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
         
         {/* Meta tags adicionais que não estão no metadata */}
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
+        {/* A tag viewport é injetada automaticamente pela exportação 'viewport' acima */}
       </head>
       <body className="min-h-screen flex flex-col overflow-x-hidden">
         <Header />
