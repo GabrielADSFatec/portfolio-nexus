@@ -48,7 +48,7 @@ export default function Footer() {
               </div>
               <div className="text-left">
                 <h3 className="text-xl font-bold text-white">{siteConfig.name}</h3>
-                <p className="text-sm text-primary-300">Escritório de projetos</p>
+                <p className="text-sm text-white">Escritório de projetos</p>
               </div>
             </Link>
 

@@ -6,13 +6,17 @@ import { Menu, X } from 'lucide-react';
 import { publicNavigation, siteConfig } from '@/constants';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 
 export default function Header() {
+  // ✅ PRIMEIRO: Todos os hooks devem vir ANTES de qualquer condicional
+  const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
+  // ✅ DEPOIS: Efeitos e outras lógicas
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -24,7 +28,6 @@ export default function Header() {
       }
     };
 
-    // Fechar menu ao clicar fora dele
     const handleClickOutside = (event: MouseEvent) => {
       if (
         mobileMenuRef.current && 
@@ -61,6 +64,14 @@ export default function Header() {
       document.documentElement.style.overflowX = 'unset';
     };
   }, [isMobileMenuOpen]);
+
+  // ✅ AGORA SIM: A condicional pode vir DEPOIS de todos os hooks
+  const isAdminRoute = pathname.startsWith('/admin');
+  if (isAdminRoute) {
+    return null;
+  }
+
+  // 🔽 O RESTO DO CÓDIGO PERMANECE IGUAL 🔽
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -144,7 +155,6 @@ export default function Header() {
                   <span className="relative z-10 transition-all duration-300 group-hover:scale-105">
                     {item.name}
                   </span>
-                  {/* Efeito de background animado */}
                   <div className={cn(
                     'absolute inset-0 scale-0 group-hover:scale-100 transition-transform duration-300 rounded-lg',
                     isScrolled 
@@ -170,7 +180,6 @@ export default function Header() {
                 aria-label="Toggle mobile menu"
                 aria-expanded={isMobileMenuOpen}
               >
-                {/* Background animado */}
                 <div className={cn(
                   "absolute inset-0 scale-0 group-hover:scale-100 transition-transform duration-300 rounded-xl",
                   isScrolled 
@@ -190,7 +199,7 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile Navigation - Menu Overlay */}
+        {/* Mobile Navigation */}
         <div 
           ref={mobileMenuRef}
           className={cn(
@@ -217,12 +226,8 @@ export default function Header() {
                   animation: isMobileMenuOpen ? 'slideInFromRight 0.5s ease-out forwards' : 'none'
                 }}
               >
-                {/* Background animado */}
                 <div className="absolute inset-0 bg-gradient-to-r from-neutral-100 to-neutral-50 scale-0 group-hover:scale-100 transition-transform duration-300 rounded-xl" />
-                
-                {/* Indicador lateral */}
                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-neutral-800 scale-y-0 group-hover:scale-y-100 transition-transform duration-300 rounded-r" />
-                
                 <span className="relative z-10 block transition-transform duration-300 group-hover:translate-x-2">
                   {item.name}
                 </span>

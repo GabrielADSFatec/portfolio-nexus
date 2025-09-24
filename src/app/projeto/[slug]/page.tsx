@@ -269,7 +269,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             </div>
             
             {project.full_description ? (
-              <div className="bg-black rounded-2xl shadow-lg border border-neutral-200 p-8 md:p-12">
+              <div className="bg-black text-white rounded-2xl shadow-lg border border-neutral-200 p-8 md:p-12">
                 <div 
                   className="prose prose-lg prose-neutral max-w-none 
                            prose-headings:text-neutral-900 prose-headings:font-bold prose-headings:text-2xl
@@ -288,12 +288,12 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             ) : (
               <div className="text-center py-16 bg-neutral-100 rounded-2xl border border-neutral-300">
                 <div className="w-20 h-20 bg-neutral-300 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Code className="w-10 h-10 text-neutral-700" />
+                  <Code className="w-10 h-10 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-neutral-900 mb-2">
+                <h3 className="text-xl font-semibold text-white mb-2">
                   Descrição Detalhada
                 </h3>
-                <p className="text-neutral-800 font-medium">
+                <p className="text-white font-medium">
                   A descrição completa deste projeto será adicionada em breve...
                 </p>
               </div>
