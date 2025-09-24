@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
@@ -28,31 +28,12 @@ const isValidUrlFormat = (url: string): boolean => {
   }
 };
 
-const extractFilePathFromUrl = (url: string): string | null => {
-  try {
-    const urlObj = new URL(url);
-    const pathParts = urlObj.pathname.split('/');
-    const publicIndex = pathParts.indexOf('public');
-    if (publicIndex !== -1) {
-      return pathParts.slice(publicIndex + 1).join('/');
-    }
-    return null;
-  } catch {
-    return null;
-  }
-};
-
-export default function EditClientPage() {
+export default function CreateClientPage() {
   const router = useRouter();
-  const params = useParams();
-  const id = params.id as string;
-
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>('');
   const [uploadError, setUploadError] = useState<string>('');
-  const [originalLogoUrl, setOriginalLogoUrl] = useState<string>('');
   
   const [formData, setFormData] = useState({
     name: '',
@@ -67,47 +48,6 @@ export default function EditClientPage() {
   });
 
   const supabase = createClient();
-
-  useEffect(() => {
-    const loadClient = async () => {
-      if (!id) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const { data, error } = await supabase
-          .from('clients')
-          .select('*')
-          .eq('id', id)
-          .single();
-
-        if (error) throw error;
-
-        setFormData({
-          name: data.name,
-          website_url: data.website_url || '',
-          description: data.description || '',
-          order_index: data.order_index,
-          is_active: data.is_active,
-        });
-        setLogoPreview(data.logo_url);
-        setOriginalLogoUrl(data.logo_url);
-      } catch (error) {
-        console.error('Erro ao carregar cliente:', error);
-        alert('Erro ao carregar dados do cliente.');
-        router.push('/admin/clients');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) {
-      loadClient();
-    } else {
-      setLoading(false);
-    }
-  }, [id, router]);
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -139,7 +79,7 @@ export default function EditClientPage() {
 
   const handleRemoveLogo = () => {
     setLogoFile(null);
-    setLogoPreview(originalLogoUrl);
+    setLogoPreview('');
     const fileInput = document.getElementById('logo-upload') as HTMLInputElement;
     if (fileInput) fileInput.value = '';
   };
@@ -154,33 +94,18 @@ export default function EditClientPage() {
       return;
     }
 
-    if (!formData.name.trim()) {
-      setUploadError('Preencha o nome');
+    if (!formData.name || !logoFile) {
+      setUploadError(!logoFile ? 'Selecione um logo' : 'Preencha o nome');
       return;
     }
 
-    setSaving(true);
+    setLoading(true);
 
     try {
-      let logoUrl = formData.name; // This should be the original logo URL, but it's incorrectly set to formData.name
+      let logoUrl = '';
 
-      // Correct the logoUrl assignment
-      logoUrl = originalLogoUrl;
-
-      // Upload do novo logo se fornecido
+      // Upload do logo
       if (logoFile) {
-        // Remove logo antigo se existir
-        if (originalLogoUrl) {
-          const oldFilePath = extractFilePathFromUrl(originalLogoUrl);
-          if (oldFilePath) {
-            await supabase.storage
-              .from('portfolio-images')
-              .remove([oldFilePath])
-              .catch(error => console.warn('Erro ao remover logo antigo:', error));
-          }
-        }
-
-        // Upload do novo logo
         const fileExt = logoFile.name.split('.').pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
         const filePath = `clients/${fileName}`;
@@ -201,32 +126,44 @@ export default function EditClientPage() {
         logoUrl = publicUrl;
       }
 
+      // Determinar a próxima ordem disponível
+      const { data: existingClients } = await supabase
+        .from('clients')
+        .select('order_index')
+        .order('order_index', { ascending: false })
+        .limit(1);
+
+      const nextOrder = existingClients && existingClients.length > 0 
+        ? existingClients[0].order_index + 1 
+        : 0;
+
       // Formata a URL do website
       const formattedWebsiteUrl = formData.website_url ? formatUrl(formData.website_url) : null;
 
-      // Atualiza no banco
+      // Insere no banco de dados
       const { error } = await supabase
         .from('clients')
-        .update({
-          name: formData.name.trim(),
-          logo_url: logoUrl,
-          website_url: formattedWebsiteUrl,
-          description: formData.description.trim(),
-          order_index: formData.order_index,
-          is_active: formData.is_active,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', id);
+        .insert([
+          {
+            name: formData.name,
+            logo_url: logoUrl,
+            website_url: formattedWebsiteUrl,
+            description: formData.description,
+            order_index: formData.order_index || nextOrder,
+            is_active: formData.is_active,
+          }
+        ]);
 
       if (error) throw error;
 
-      alert('Cliente atualizado com sucesso!');
+      alert('Cliente criado com sucesso!');
       router.push('/admin/clients');
+      router.refresh();
     } catch (error) {
-      console.error('Erro ao atualizar cliente:', error);
-      setUploadError('Erro ao atualizar cliente. Tente novamente.');
+      console.error('Erro ao criar cliente:', error);
+      setUploadError('Erro ao criar cliente. Tente novamente.');
     } finally {
-      setSaving(false);
+      setLoading(false);
     }
   };
 
@@ -250,25 +187,6 @@ export default function EditClientPage() {
     }));
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-neutral-900 p-6 md:p-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <Link
-              href="/admin/clients"
-              className="flex items-center gap-2 text-neutral-400 hover:text-white transition-colors mb-4"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              Voltar para a listagem
-            </Link>
-            <h1 className="text-2xl md:text-3xl font-bold text-white">Carregando...</h1>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-neutral-900 p-6 md:p-8">
       {/* Header */}
@@ -281,19 +199,20 @@ export default function EditClientPage() {
             <ArrowLeft className="w-5 h-5" />
             Voltar para a listagem
           </Link>
-          <h1 className="text-2xl md:text-3xl font-bold text-white">Editar Cliente</h1>
-          <p className="text-neutral-400">Editando: {formData.name}</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-white">Adicionar Cliente</h1>
+          <p className="text-neutral-400">Cadastre um novo cliente/empresa</p>
         </div>
       </div>
 
       {/* Form */}
       <div className="max-w-4xl">
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Logo Upload Section */}
+          {/* Logo Upload */}
           <div className="bg-neutral-800/50 rounded-xl p-6 border border-neutral-700/50">
-            <label className="block text-lg font-medium text-white mb-4">Logo do Cliente</label>
+            <label className="block text-lg font-medium text-white mb-4">Logo do Cliente *</label>
             
             <div className="flex flex-col md:flex-row gap-6">
+              {/* Preview */}
               <div className="flex-1">
                 <div className="aspect-square bg-neutral-700/50 rounded-lg border-2 border-dashed border-neutral-600 overflow-hidden flex items-center justify-center">
                   {logoPreview ? (
@@ -309,7 +228,7 @@ export default function EditClientPage() {
                   ) : (
                     <div className="text-center text-neutral-400">
                       <Building className="w-12 h-12 mx-auto mb-2" />
-                      <p>Nenhum logo</p>
+                      <p>Nenhum logo selecionado</p>
                     </div>
                   )}
                 </div>
@@ -320,15 +239,16 @@ export default function EditClientPage() {
                     className="mt-2 flex items-center gap-1 text-red-400 text-sm hover:text-red-300"
                   >
                     <Trash2 className="w-4 h-4" />
-                    Remover novo logo
+                    Remover logo
                   </button>
                 )}
               </div>
 
+              {/* Upload Controls */}
               <div className="flex-1 space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-neutral-300 mb-2">
-                    Alterar logo (opcional)
+                    Selecione um logo *
                   </label>
                   <input
                     id="logo-upload"
@@ -347,9 +267,9 @@ export default function EditClientPage() {
                 )}
                 
                 <div className="text-sm text-neutral-400">
-                  <p>• Deixe em branco para manter o logo atual</p>
                   <p>• Formatos: JPG, PNG, WEBP, SVG</p>
                   <p>• Tamanho máximo: <strong>2MB</strong></p>
+                  <p>• Ideal: quadrado ou retangular, fundo transparente</p>
                 </div>
               </div>
             </div>
@@ -395,6 +315,10 @@ export default function EditClientPage() {
                   {errors.website_url}
                 </p>
               )}
+              <p className="text-xs text-neutral-500 mt-1 flex items-center gap-1">
+                <Globe className="w-3 h-3" />
+                https:// será adicionado automaticamente
+              </p>
             </div>
 
             <div>
@@ -426,6 +350,9 @@ export default function EditClientPage() {
                   onChange={handleChange}
                   className="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
+                <p className="text-xs text-neutral-500 mt-1">
+                  Número que define a ordem dos clientes (0 = primeiro)
+                </p>
               </div>
 
               <div className="flex items-center space-x-3 pt-6">
@@ -454,15 +381,15 @@ export default function EditClientPage() {
             </Link>
             <button
               type="submit"
-              disabled={saving || !formData.name.trim()}
+              disabled={loading || !formData.name || !logoFile}
               className={cn(
                 'flex items-center gap-2 px-6 py-3 bg-primary-500 text-white rounded-lg transition-colors',
-                (saving || !formData.name.trim()) 
+                (loading || !formData.name || !logoFile) 
                   ? 'opacity-50 cursor-not-allowed' 
                   : 'hover:bg-primary-600'
               )}
             >
-              {saving ? (
+              {loading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   Salvando...
@@ -470,7 +397,7 @@ export default function EditClientPage() {
               ) : (
                 <>
                   <Save className="w-4 h-4" />
-                  Salvar Alterações
+                  Salvar Cliente
                 </>
               )}
             </button>

@@ -26,6 +26,7 @@ const iconMap = {
   Briefcase,
   Users,
   MessageSquare,
+  Settings,
 };
 
 export default function AdminLayout({
