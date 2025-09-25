@@ -162,8 +162,8 @@ export default function EditClientPage() {
     setSaving(true);
 
     try {
-      let logoUrl = formData.name; // This should be the original logo URL, but it's incorrectly set to formData.name
-
+      //let logoUrl = formData.name; // This should be the original logo URL, but it's incorrectly set to formData.name
+      let logoUrl = originalLogoUrl; // ✅ CORRETO
       // Correct the logoUrl assignment
       logoUrl = originalLogoUrl;
 
