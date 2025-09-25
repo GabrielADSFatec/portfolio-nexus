@@ -17,7 +17,6 @@ export default function HeroSection() {
   const supabase = createClient();
 
   useEffect(() => {
-    // Atualizar largura da janela
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };
@@ -28,7 +27,6 @@ export default function HeroSection() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Carregar dados do Supabase
   useEffect(() => {
     const loadCarouselData = async () => {
       setIsLoading(true);
@@ -50,7 +48,6 @@ export default function HeroSection() {
         if (data && data.length > 0) {
           setCarouselItems(data);
         } else {
-          // Se não há dados, criar um slide padrão
           setCarouselItems([
             {
               id: 'default',
@@ -75,7 +72,6 @@ export default function HeroSection() {
     loadCarouselData();
   }, [supabase]);
 
-  // Auto-play do carrossel
   useEffect(() => {
     if (carouselItems.length <= 1) return;
 
@@ -98,7 +94,6 @@ export default function HeroSection() {
     setCurrentSlide(index);
   };
 
-  // Loading
   if (isLoading) {
     return (
       <section className="relative h-screen flex items-center justify-center bg-gradient-to-br from-primary-600 via-primary-700 to-secondary-600">
@@ -111,8 +106,6 @@ export default function HeroSection() {
   }
 
   const currentItem = carouselItems[currentSlide];
-
-  // Ajustar posição dos botões baseado na largura da tela
   const buttonPosition = windowWidth < 768 ? 'top-2/3' : 'top-1/2';
 
   return (
@@ -137,29 +130,31 @@ export default function HeroSection() {
       {/* Content */}
       <div className="relative z-10 h-full flex items-center">
         <div className="container">
-          <div className="max-w-3xl mx-4 md:mx-auto">
+          <div className="max-w-2xl mx-4 md:mx-auto"> {/* Reduzido de max-w-3xl para max-w-2xl */}
             <div className="animate-fade-in">
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 drop-shadow-2xl [text-shadow:_0_4px_12px_rgb(0_0_0_/_80%)]">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-8 md:mb-12 drop-shadow-2xl [text-shadow:_0_4px_12px_rgb(0_0_0_/_80%)]">
                 {currentItem.title}
               </h1>
               {currentItem.description && (
-                <div className="relative mb-8">
-                  <p className="text-xl md:text-2xl text-white/95 leading-relaxed drop-shadow-lg [text-shadow:_0_2px_8px_rgb(0_0_0_/_60%)] bg-black/20 backdrop-blur-sm rounded-lg p-4 border border-white/10 pr-10 md:pr-4">
-                    {currentItem.description}
+                <div className="relative mb-8 mt-4 md:mt-16 lg:mt-20"> {/* Mobile: mt-4, Desktop: mt-16/mt-20 */}
+    <p className="text-xl md:text-2xl text-white/95 leading-relaxed drop-shadow-lg 
+                  [text-shadow:_0_2px_8px_rgb(0_0_0_/_60%)] bg-black/40 backdrop-blur-sm 
+                  rounded-lg p-4 border border-white/10 max-w-md mx-auto">
+      {currentItem.description}
                   </p>
                 </div>
               )}
               <div className="flex flex-col sm:flex-row gap-4">
                 <a
                   href="#projetos"
-                  className="btn btn-primary btn-lg inline-flex items-center gap-2 group shadow-2xl shadow-primary-900/50 backdrop-blur-sm border border-white/20"
+                  className="btn btn-primary btn-lg inline-flex items-center gap-2 group shadow-2xl bg-white text-gray-900 hover:bg-gray-100 border-transparent font-semibold" /* Botão branco sólido */
                 >
                   Ver Projetos
                   <ChevronDown className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
                 </a>
                 <a
                   href="#contato"
-                  className="btn btn-outline btn-lg border-2 border-white text-white hover:bg-white hover:text-primary-600 backdrop-blur-sm bg-white/10 hover:bg-white shadow-lg shadow-black/30 transition-all"
+                  className="btn btn-outline btn-lg border-2 border-white text-white bg-gray-900/90 hover:bg-white hover:text-gray-900 backdrop-blur-sm shadow-lg shadow-black/30 transition-all font-semibold" /* Mantido como estava */
                 >
                   Entre em Contato
                 </a>
