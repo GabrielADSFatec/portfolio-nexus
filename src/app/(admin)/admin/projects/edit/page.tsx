@@ -24,7 +24,7 @@ export default function CreateProjectPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
-  
+
   const [formData, setFormData] = useState({
     title: '',
     slug: '',
@@ -58,6 +58,7 @@ export default function CreateProjectPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     setError('');
     setLoading(true);
 
@@ -94,8 +95,8 @@ export default function CreateProjectPage() {
         .order('order_index', { ascending: false })
         .limit(1);
 
-      const nextOrder = existingProjects && existingProjects.length > 0 
-        ? existingProjects[0].order_index + 1 
+      const nextOrder = existingProjects && existingProjects.length > 0
+        ? existingProjects[0].order_index + 1
         : 0;
 
       // Inserir projeto no banco
@@ -145,8 +146,12 @@ export default function CreateProjectPage() {
       }
 
       alert('Projeto criado com sucesso!');
-      router.push('/admin/projects');
-      router.refresh();
+      // Use replace em vez de push para evitar histórico de navegação problemático
+      router.replace('/admin/projects');
+      // Aguarde um pouco antes do refresh para garantir a navegação
+      setTimeout(() => {
+        router.refresh();
+      }, 100);
 
     } catch (err) {
       console.error('Erro ao criar projeto:', err);
@@ -238,7 +243,7 @@ export default function CreateProjectPage() {
           {/* Seção: Informações Básicas */}
           <div className="bg-neutral-800/50 rounded-xl p-6 border border-neutral-700/50">
             <h2 className="text-lg font-semibold text-white mb-6">Informações Básicas</h2>
-            
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="title" className="block text-sm font-medium text-neutral-300 mb-2">
@@ -335,7 +340,7 @@ export default function CreateProjectPage() {
           {/* Seção: Links e Configurações */}
           <div className="bg-neutral-800/50 rounded-xl p-6 border border-neutral-700/50">
             <h2 className="text-lg font-semibold text-white mb-6">Links e Configurações</h2>
-            
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="github_url" className="block text-sm font-medium text-neutral-300 mb-2">
@@ -438,8 +443,8 @@ export default function CreateProjectPage() {
               disabled={loading || !formData.title || !mainImage || !formData.slug}
               className={cn(
                 'flex items-center gap-2 px-6 py-3 bg-primary-500 text-white rounded-lg transition-colors',
-                (loading || !formData.title || !mainImage || !formData.slug) 
-                  ? 'opacity-50 cursor-not-allowed' 
+                (loading || !formData.title || !mainImage || !formData.slug)
+                  ? 'opacity-50 cursor-not-allowed'
                   : 'hover:bg-primary-600'
               )}
             >

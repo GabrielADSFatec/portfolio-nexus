@@ -18,28 +18,43 @@ interface ProjectPageProps {
 async function getProject(slug: string): Promise<Project | null> {
   const supabase = await createClient();
   
-  const { data, error } = await supabase
-    .from('projects')
-    .select(`
-      *,
-      images:project_images(
-        id,
-        image_url,
-        image_alt,
-        display_order
-      )
-    `)
-    .eq('slug', slug)
-    .eq('is_active', true)
-    .eq('project_images.is_active', true)
-    .order('display_order', { foreignTable: 'project_images', ascending: true })
-    .single();
+  try {
+    // Primeiro, busca o projeto principal
+    const { data: project, error: projectError } = await supabase
+      .from('projects')
+      .select('*')
+      .eq('slug', slug)
+      .eq('is_active', true)
+      .single();
 
-  if (error || !data) {
+    if (projectError || !project) {
+      console.error('Erro ao buscar projeto:', projectError);
+      return null;
+    }
+
+    // Depois, busca as imagens separadamente
+    const { data: images, error: imagesError } = await supabase
+      .from('project_images')
+      .select('*')
+      .eq('project_id', project.id)
+      .eq('is_active', true)
+      .order('display_order', { ascending: true });
+
+    if (imagesError) {
+      console.warn('Erro ao buscar imagens, usando apenas imagem principal:', imagesError);
+      // Não retorna null, apenas usa array vazio para imagens
+    }
+
+    // Retorna o projeto com as imagens
+    return {
+      ...project,
+      images: images || []
+    };
+    
+  } catch (error) {
+    console.error('Erro inesperado ao carregar projeto:', error);
     return null;
   }
-
-  return data;
 }
 
 // Função para buscar projetos relacionados
