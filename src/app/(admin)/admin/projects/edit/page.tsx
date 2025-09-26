@@ -1,6 +1,7 @@
+// app/admin/projects/edit/page.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
@@ -44,7 +45,8 @@ export default function CreateProjectPage() {
 
   const supabase = createClient();
 
-  const checkSlugUnique = async (slug: string): Promise<boolean> => {
+  // CORREÇÃO: useCallback para memorizar a função
+  const checkSlugUnique = useCallback(async (slug: string): Promise<boolean> => {
     const { data, error } = await supabase
       .from('projects')
       .select('id')
@@ -52,10 +54,30 @@ export default function CreateProjectPage() {
       .single();
 
     return !data;
-  };
+  }, [supabase]);
+
+  // CORREÇÃO: useCallback para handleTechnologiesChange
+  const handleTechnologiesChange = useCallback((technologies: string[]) => {
+    setFormData(prev => ({
+      ...prev,
+      technologies,
+    }));
+  }, []);
+
+  // CORREÇÃO: useCallback para handleMainImageChange
+  const handleMainImageChange = useCallback((file: File | null) => {
+    setMainImage(file);
+    if (file) {
+      const preview = URL.createObjectURL(file);
+      setMainImagePreview(preview);
+    } else {
+      setMainImagePreview('');
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("1. Início do handleSubmit");
     
     setError('');
     setLoading(true);
@@ -82,6 +104,7 @@ export default function CreateProjectPage() {
       if (!mainImageUrl) {
         throw new Error('Erro ao fazer upload da imagem principal');
       }
+      console.log("2. Validações passadas, preparando para fazer upload/fazer update");
 
       const { data: existingProjects } = await supabase
         .from('projects')
@@ -136,10 +159,12 @@ export default function CreateProjectPage() {
 
         await Promise.all(galleryPromises);
       }
+      console.log("3. Operação no Supabase bem-sucedida. Projeto salvo.");
 
       alert('Projeto criado com sucesso!');
-      // CORREÇÃO: Usar push em vez de replace e remover o refresh
+      console.log("4. Antes do router.push");
       router.push('/admin/projects');
+      console.log("5. Depois do router.push");
       
     } catch (err) {
       console.error('Erro ao criar projeto:', err);
@@ -189,23 +214,6 @@ export default function CreateProjectPage() {
       ...prev,
       [name]: checked,
     }));
-  };
-
-  const handleTechnologiesChange = (technologies: string[]) => {
-    setFormData(prev => ({
-      ...prev,
-      technologies,
-    }));
-  };
-
-  const handleMainImageChange = (file: File | null) => {
-    setMainImage(file);
-    if (file) {
-      const preview = URL.createObjectURL(file);
-      setMainImagePreview(preview);
-    } else {
-      setMainImagePreview('');
-    }
   };
 
   return (

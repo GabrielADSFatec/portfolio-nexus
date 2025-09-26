@@ -148,6 +148,7 @@ export default function EditProjectPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("1. Início do handleSubmit");
     if (saving) return;
     setError('');
     setSaving(true);
@@ -185,6 +186,7 @@ export default function EditProjectPage() {
         }
         mainImageUrl = uploadedUrl;
       }
+      console.log("2. Validações passadas, preparando para fazer upload/fazer update");
 
       const { error: projectError } = await supabase
         .from('projects')
@@ -207,11 +209,12 @@ export default function EditProjectPage() {
       if (projectError) throw projectError;
 
       await manageGalleryImages();
-
+      console.log("3. Operação no Supabase bem-sucedida. Projeto salvo.");
       alert('Projeto atualizado com sucesso!');
-      // CORREÇÃO: Usar push em vez de replace e remover o refresh
+      console.log("4. Antes do router.push");
       router.push('/admin/projects');
-
+      console.log("5. Depois do router.push");
+      
     } catch (err) {
       console.error('Erro ao atualizar projeto:', err);
       setError(err instanceof Error ? err.message : 'Erro ao atualizar projeto');

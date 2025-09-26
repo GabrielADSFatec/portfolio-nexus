@@ -1,6 +1,7 @@
+// components/admin/SlugInput.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, RefreshCw, Check, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -24,53 +25,54 @@ export default function SlugInput({
   const [isChecking, setIsChecking] = useState(false);
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
   const [isCustom, setIsCustom] = useState(false);
+  const [lastCheckedSlug, setLastCheckedSlug] = useState<string>('');
 
-  // Gerar slug do título
-  const generateSlug = (text: string) => {
+  // CORREÇÃO: useCallback para evitar recriação da função
+  const generateSlug = useCallback((text: string) => {
     return text
       .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)+/g, '');
-  };
+  }, []);
 
-  // Verificar disponibilidade do slug
-  const checkSlugAvailability = async (slug: string) => {
-    if (!slug || !onSlugCheck) return;
-    
-    setIsChecking(true);
-    try {
-      const available = await onSlugCheck(slug);
-      setIsAvailable(available);
-    } catch (error) {
-      console.error('Erro ao verificar slug:', error);
-      setIsAvailable(null);
-    } finally {
-      setIsChecking(false);
-    }
-  };
-
-  // Auto-gerar slug quando o título mudar (apenas se não for custom)
+  // CORREÇÃO CRÍTICA: useEffect com dependências corretas e condição de guarda
   useEffect(() => {
     if (!isCustom && title) {
       const newSlug = generateSlug(title);
-      onChange(newSlug);
+      // Só atualiza se o slug gerado for diferente do atual
+      if (newSlug !== value) {
+        onChange(newSlug);
+      }
     }
-  }, [title, isCustom, onChange]);
+  }, [title, isCustom, generateSlug, value, onChange]);
 
-  // Verificar disponibilidade quando o slug mudar
+  // CORREÇÃO: useEffect separado para verificação de disponibilidade
   useEffect(() => {
-    if (value) {
-      const timeoutId = setTimeout(() => {
-        checkSlugAvailability(value);
-      }, 500);
+    const checkSlugAvailability = async () => {
+      if (!value || !onSlugCheck) return;
       
-      return () => clearTimeout(timeoutId);
-    } else {
-      setIsAvailable(null);
-    }
-  }, [value]);
+      // Evita verificar o mesmo slug repetidamente
+      if (value === lastCheckedSlug) return;
+
+      setIsChecking(true);
+      try {
+        const available = await onSlugCheck(value);
+        setIsAvailable(available);
+        setLastCheckedSlug(value);
+      } catch (error) {
+        console.error('Erro ao verificar slug:', error);
+        setIsAvailable(null);
+      } finally {
+        setIsChecking(false);
+      }
+    };
+
+    // Debounce para evitar verificações desnecessárias
+    const timeoutId = setTimeout(checkSlugAvailability, 500);
+    return () => clearTimeout(timeoutId);
+  }, [value, onSlugCheck, lastCheckedSlug]);
 
   const handleGenerateClick = () => {
     const newSlug = generateSlug(title);
@@ -79,7 +81,7 @@ export default function SlugInput({
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newSlug = generateSlug(e.target.value); // Sempre gerar do input
+    const newSlug = generateSlug(e.target.value);
     onChange(newSlug);
     setIsCustom(true);
   };
