@@ -317,7 +317,7 @@ export default function MessagesPage() {
             >
               Remetente
               {sortField === 'name' && (
-                sortOrder === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
+                sortOrder === 'asc' ? <ChevronUp className="w-4 h-4 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 flex-shrink-0" />
               )}
             </button>
             <button 
@@ -326,7 +326,7 @@ export default function MessagesPage() {
             >
               E-mail
               {sortField === 'email' && (
-                sortOrder === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
+                sortOrder === 'asc' ? <ChevronUp className="w-4 h-4 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 flex-shrink-0" />
               )}
             </button>
             <div className="col-span-4">Mensagem</div>

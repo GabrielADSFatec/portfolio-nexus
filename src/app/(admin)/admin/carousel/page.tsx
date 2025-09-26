@@ -1,21 +1,22 @@
 //listagem
 
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
-import { 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Eye, 
-  EyeOff, 
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Eye,
+  EyeOff,
   ArrowUpDown,
   Search,
-  Loader2
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+  Loader2,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface CarouselItem {
   id: string;
@@ -34,10 +35,10 @@ const extractFilePathFromUrl = (url: string): string | null => {
   try {
     const urlObj = new URL(url);
     // A URL do Supabase tem o formato: /storage/v1/object/public/portfolio-images/carousel/filename.jpg
-    const pathParts = urlObj.pathname.split('/');
-    const publicIndex = pathParts.indexOf('public');
+    const pathParts = urlObj.pathname.split("/");
+    const publicIndex = pathParts.indexOf("public");
     if (publicIndex !== -1) {
-      return pathParts.slice(publicIndex + 1).join('/');
+      return pathParts.slice(publicIndex + 1).join("/");
     }
     return null;
   } catch {
@@ -49,9 +50,11 @@ export default function CarouselPage() {
   const [items, setItems] = useState<CarouselItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<'order_index' | 'title' | 'created_at'>('order_index');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState<"order_index" | "title" | "created_at">(
+    "order_index"
+  );
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   const supabase = createClient();
 
@@ -62,21 +65,25 @@ export default function CarouselPage() {
   const loadCarouselItems = async () => {
     try {
       const { data, error } = await supabase
-        .from('carousel_items')
-        .select('*')
-        .order('order_index', { ascending: true });
+        .from("carousel_items")
+        .select("*")
+        .order("order_index", { ascending: true });
 
       if (error) throw error;
       setItems(data || []);
     } catch (error) {
-      console.error('Erro ao carregar carrossel:', error);
+      console.error("Erro ao carregar carrossel:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja excluir este item do carrossel?\n\nA imagem também será removida do storage.')) {
+    if (
+      !confirm(
+        "Tem certeza que deseja excluir este item do carrossel?\n\nA imagem também será removida do storage."
+      )
+    ) {
       return;
     }
 
@@ -84,9 +91,9 @@ export default function CarouselPage() {
     try {
       // Primeiro busca o item para obter a URL da imagem
       const { data: item, error: fetchError } = await supabase
-        .from('carousel_items')
-        .select('image_url')
-        .eq('id', id)
+        .from("carousel_items")
+        .select("image_url")
+        .eq("id", id)
         .single();
 
       if (fetchError) throw fetchError;
@@ -96,30 +103,33 @@ export default function CarouselPage() {
         const filePath = extractFilePathFromUrl(item.image_url);
         if (filePath) {
           const { error: storageError } = await supabase.storage
-            .from('portfolio-images')
+            .from("portfolio-images")
             .remove([filePath]);
 
           if (storageError) {
-            console.warn('Aviso: Imagem não encontrada no storage, continuando exclusão...', storageError);
+            console.warn(
+              "Aviso: Imagem não encontrada no storage, continuando exclusão...",
+              storageError
+            );
           }
         }
       }
 
       // Exclui o registro do banco
       const { error } = await supabase
-        .from('carousel_items')
+        .from("carousel_items")
         .delete()
-        .eq('id', id);
+        .eq("id", id);
 
       if (error) throw error;
-      
+
       // Remove o item da lista localmente
-      setItems(prev => prev.filter(item => item.id !== id));
-      
-      alert('Item excluído com sucesso!');
+      setItems((prev) => prev.filter((item) => item.id !== id));
+
+      alert("Item excluído com sucesso!");
     } catch (error) {
-      console.error('Erro ao excluir item:', error);
-      alert('Erro ao excluir item. Tente novamente.');
+      console.error("Erro ao excluir item:", error);
+      alert("Erro ao excluir item. Tente novamente.");
     } finally {
       setDeleteLoading(null);
     }
@@ -128,48 +138,53 @@ export default function CarouselPage() {
   const toggleActive = async (id: string, currentStatus: boolean) => {
     try {
       const { error } = await supabase
-        .from('carousel_items')
+        .from("carousel_items")
         .update({ is_active: !currentStatus })
-        .eq('id', id);
+        .eq("id", id);
 
       if (error) throw error;
-      
+
       // Atualiza o status localmente
-      setItems(prev => prev.map(item =>
-        item.id === id ? { ...item, is_active: !currentStatus } : item
-      ));
+      setItems((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, is_active: !currentStatus } : item
+        )
+      );
     } catch (error) {
-      console.error('Erro ao alterar status:', error);
-      alert('Erro ao alterar status do item.');
+      console.error("Erro ao alterar status:", error);
+      alert("Erro ao alterar status do item.");
     }
   };
 
-  const handleSort = (column: 'order_index' | 'title' | 'created_at') => {
+  const handleSort = (column: "order_index" | "title" | "created_at") => {
     if (sortBy === column) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
       setSortBy(column);
-      setSortOrder('asc');
+      setSortOrder("asc");
     }
   };
 
   // Filtra e ordena os itens
   const filteredAndSortedItems = items
-    .filter(item =>
-      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description?.toLowerCase().includes(searchTerm.toLowerCase())
+    .filter(
+      (item) =>
+        item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.description?.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .sort((a, b) => {
-      if (sortBy === 'order_index') {
-        return sortOrder === 'asc' ? a.order_index - b.order_index : b.order_index - a.order_index;
+      if (sortBy === "order_index") {
+        return sortOrder === "asc"
+          ? a.order_index - b.order_index
+          : b.order_index - a.order_index;
       }
-      if (sortBy === 'title') {
-        return sortOrder === 'asc' 
+      if (sortBy === "title") {
+        return sortOrder === "asc"
           ? a.title.localeCompare(b.title)
           : b.title.localeCompare(a.title);
       }
-      if (sortBy === 'created_at') {
-        return sortOrder === 'asc'
+      if (sortBy === "created_at") {
+        return sortOrder === "asc"
           ? new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
           : new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       }
@@ -181,12 +196,14 @@ export default function CarouselPage() {
       <div className="min-h-screen bg-neutral-900 p-6 md:p-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Carrossel</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
+              Carrossel
+            </h1>
             <p className="text-neutral-400">Gerenciar slides da homepage</p>
           </div>
           <div className="w-40 h-10 bg-neutral-800 rounded-lg animate-pulse"></div>
         </div>
-        
+
         <div className="bg-neutral-800/50 rounded-xl p-6 border border-neutral-700/50">
           <div className="animate-pulse space-y-4">
             {[...Array(5)].map((_, i) => (
@@ -210,12 +227,14 @@ export default function CarouselPage() {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-8 gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Carrossel</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
+            Carrossel
+          </h1>
           <p className="text-neutral-400">
-            {items.length} {items.length === 1 ? 'item' : 'itens'} no carrossel
+            {items.length} {items.length === 1 ? "item" : "itens"} no carrossel
           </p>
         </div>
-        
+
         <Link
           href="/admin/carousel/edit"
           className="bg-primary-500 hover:bg-primary-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors w-fit"
@@ -238,15 +257,17 @@ export default function CarouselPage() {
               className="w-full pl-10 pr-4 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
           </div>
-          
+
           <div className="flex items-center gap-4 text-sm text-neutral-400">
-            <span className={cn(
-              "px-2 py-1 rounded-full",
-              items.filter(i => i.is_active).length > 0 
-                ? "bg-green-500/20 text-green-400" 
-                : "bg-neutral-700/50"
-            )}>
-              {items.filter(i => i.is_active).length} ativos
+            <span
+              className={cn(
+                "px-2 py-1 rounded-full",
+                items.filter((i) => i.is_active).length > 0
+                  ? "bg-green-500/20 text-green-400"
+                  : "bg-neutral-700/50"
+              )}
+            >
+              {items.filter((i) => i.is_active).length} ativos
             </span>
             <span className="px-2 py-1 rounded-full bg-neutral-700/50">
               {items.length} total
@@ -261,49 +282,59 @@ export default function CarouselPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-neutral-700/50">
-                <th className="text-left p-4">
+                <th className="text-left p-4 flex-1 min-w-0">
                   <button
-                    onClick={() => handleSort('order_index')}
+                    onClick={() => handleSort("order_index")}
                     className="flex items-center gap-2 text-neutral-300 font-medium hover:text-white transition-colors"
                   >
                     Ordem
-                    <ArrowUpDown className="w-4 h-4" />
+                    <ArrowUpDown className="w-4 h-4 flex-shrink-0" />
                   </button>
                 </th>
-                <th className="text-left p-4">
+                <th className="text-left p-4 flex-1 min-w-0">
                   <button
-                    onClick={() => handleSort('title')}
+                    onClick={() => handleSort("title")}
                     className="flex items-center gap-2 text-neutral-300 font-medium hover:text-white transition-colors"
                   >
                     Slide
-                    <ArrowUpDown className="w-4 h-4" />
+                    <ArrowUpDown className="w-4 h-4 flex-shrink-0" />
                   </button>
                 </th>
-                <th className="text-left p-4 text-neutral-300 font-medium">Status</th>
-                <th className="text-left p-4 text-neutral-300 font-medium">Ordem</th>
-                <th className="text-left p-4 text-neutral-300 font-medium">Ações</th>
+                <th className="text-left p-4 text-neutral-300 font-medium">
+                  Status
+                </th>
+                <th className="text-left p-4 text-neutral-300 font-medium">
+                  Ordem
+                </th>
+                <th className="text-left p-4 text-neutral-300 font-medium">
+                  Ações
+                </th>
               </tr>
             </thead>
             <tbody>
               {filteredAndSortedItems.map((item) => (
-                <tr 
-                  key={item.id} 
+                <tr
+                  key={item.id}
                   className="border-b border-neutral-700/50 last:border-0 hover:bg-neutral-800/30 transition-colors"
                 >
                   <td className="p-4">
                     <div className="w-16 h-12 bg-neutral-700 rounded-lg overflow-hidden">
-                      <img
+                      <Image
                         src={item.image_url}
                         alt={item.title}
+                        width={64} // Largura em pixels (ex: 4rem = 4*16 = 64px)
+                        height={48} // Altura em pixels (ex: 3rem = 3*16 = 48px)
                         className="w-full h-full object-cover"
                       />
                     </div>
                   </td>
                   <td className="p-4">
                     <div>
-                      <div className="font-medium text-white mb-1">{item.title}</div>
+                      <div className="font-medium text-white mb-1">
+                        {item.title}
+                      </div>
                       <div className="text-sm text-neutral-400 line-clamp-2">
-                        {item.description || 'Sem descrição'}
+                        {item.description || "Sem descrição"}
                       </div>
                     </div>
                   </td>
@@ -311,38 +342,40 @@ export default function CarouselPage() {
                     <button
                       onClick={() => toggleActive(item.id, item.is_active)}
                       className={cn(
-                        'flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium transition-colors',
+                        "flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium transition-colors",
                         item.is_active
-                          ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
-                          : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
+                          ? "bg-green-500/20 text-green-400 hover:bg-green-500/30"
+                          : "bg-red-500/20 text-red-400 hover:bg-red-500/30"
                       )}
                     >
-                      {item.is_active ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                      {item.is_active ? 'Ativo' : 'Inativo'}
+                      {item.is_active ? (
+                        <Eye className="w-4 h-4" />
+                      ) : (
+                        <EyeOff className="w-4 h-4" />
+                      )}
+                      {item.is_active ? "Ativo" : "Inativo"}
                     </button>
                   </td>
-                  <td className="p-4 text-neutral-300">
-                    {item.order_index}
-                  </td>
+                  <td className="p-4 text-neutral-300">{item.order_index}</td>
                   <td className="p-4">
                     <div className="flex items-center gap-2">
                       <Link
                         href={`/admin/carousel/edit/${item.id}`}
-                        className="p-2 text-blue-400 hover:bg-blue-400/20 rounded-lg transition-colors"
+                        className="p-2 md:p-1.5 text-blue-400 hover:bg-blue-400/20 rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                         title="Editar"
                       >
-                        <Edit className="w-4 h-4" />
+                        <Edit className="w-full h-full md:w-4 md:h-4" />
                       </Link>
                       <button
                         onClick={() => handleDelete(item.id)}
                         disabled={deleteLoading === item.id}
-                        className="p-2 text-red-400 hover:bg-red-400/20 rounded-lg transition-colors disabled:opacity-50"
+                        className="p-2 md:p-1.5 text-red-400 hover:bg-red-400/20 rounded-lg transition-colors disabled:opacity-50 min-h-[44px] min-w-[44px] flex items-center justify-center"
                         title="Excluir"
                       >
                         {deleteLoading === item.id ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <Loader2 className="w-6 h-6 md:w-4 md:h-4 animate-spin" />
                         ) : (
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-full h-full md:w-4 md:h-4" />
                         )}
                       </button>
                     </div>
@@ -356,7 +389,9 @@ export default function CarouselPage() {
         {filteredAndSortedItems.length === 0 && (
           <div className="text-center py-12">
             <div className="text-neutral-400 mb-4">
-              {searchTerm ? 'Nenhum item encontrado para sua busca.' : 'Nenhum item no carrossel.'}
+              {searchTerm
+                ? "Nenhum item encontrado para sua busca."
+                : "Nenhum item no carrossel."}
             </div>
             {!searchTerm && (
               <Link
