@@ -102,7 +102,6 @@ export default function EditProjectPage() {
 
       setExistingImages(images || []);
 
-      // Converter imagens existentes para o formato da galeria
       const galleryImagesData: GalleryImage[] = (images || []).map(img => ({
         id: img.id,
         file: null,
@@ -169,9 +168,7 @@ export default function EditProjectPage() {
 
       let mainImageUrl = originalMainImage;
 
-      // Upload da nova imagem principal se fornecida
       if (mainImage) {
-        // Remove imagem antiga se existir
         if (originalMainImage) {
           const oldFilePath = extractFilePathFromUrl(originalMainImage);
           if (oldFilePath) {
@@ -182,7 +179,6 @@ export default function EditProjectPage() {
           }
         }
 
-        // Upload da nova imagem
         const uploadedUrl = await uploadImage(mainImage, 'projects/main');
         if (!uploadedUrl) {
           throw new Error('Erro ao fazer upload da nova imagem principal');
@@ -190,7 +186,6 @@ export default function EditProjectPage() {
         mainImageUrl = uploadedUrl;
       }
 
-      // Atualizar projeto no banco
       const { error: projectError } = await supabase
         .from('projects')
         .update({
@@ -211,14 +206,11 @@ export default function EditProjectPage() {
 
       if (projectError) throw projectError;
 
-      // Gerenciar imagens da galeria
       await manageGalleryImages();
 
       alert('Projeto atualizado com sucesso!');
-      router.replace('/admin/projects');
-      setTimeout(() => {
-        router.refresh();
-      }, 100);
+      // CORREÇÃO: Usar push em vez de replace e remover o refresh
+      router.push('/admin/projects');
 
     } catch (err) {
       console.error('Erro ao atualizar projeto:', err);
@@ -259,10 +251,8 @@ export default function EditProjectPage() {
     const imagesToAdd: GalleryImage[] = [];
     const imagesToUpdate: { id: string; alt: string; order: number }[] = [];
 
-    // Separar imagens para diferentes operações
     galleryImages.forEach((img, index) => {
       if (img.id && !img.is_new) {
-        // Imagem existente para atualizar
         const originalImage = existingImages.find(existing => existing.id === img.id);
         if (originalImage && (img.alt !== originalImage.image_alt || index !== originalImage.display_order)) {
           imagesToUpdate.push({
@@ -272,12 +262,10 @@ export default function EditProjectPage() {
           });
         }
       } else if (img.is_new && img.file) {
-        // Nova imagem para adicionar
         imagesToAdd.push({ ...img, order: index });
       }
     });
 
-    // Identificar imagens para deletar
     existingImages.forEach(existingImg => {
       const stillExists = galleryImages.some(img => img.id === existingImg.id);
       if (!stillExists) {
@@ -285,11 +273,7 @@ export default function EditProjectPage() {
       }
     });
 
-    // Executar operações na ordem correta
-
-    // 1. Deletar imagens removidas
     if (imagesToDelete.length > 0) {
-      // Primeiro remover do storage
       const deletePromises = imagesToDelete.map(async (imageId) => {
         const imageToDelete = existingImages.find(img => img.id === imageId);
         if (imageToDelete) {
@@ -305,14 +289,12 @@ export default function EditProjectPage() {
 
       await Promise.all(deletePromises);
 
-      // Depois remover do banco
       await supabase
         .from('project_images')
         .delete()
         .in('id', imagesToDelete);
     }
 
-    // 2. Adicionar novas imagens
     if (imagesToAdd.length > 0) {
       const addPromises = imagesToAdd.map(async (img) => {
         if (img.file) {
@@ -335,7 +317,6 @@ export default function EditProjectPage() {
       await Promise.all(addPromises);
     }
 
-    // 3. Atualizar imagens existentes
     if (imagesToUpdate.length > 0) {
       const updatePromises = imagesToUpdate.map(update =>
         supabase

@@ -44,7 +44,6 @@ export default function CreateProjectPage() {
 
   const supabase = createClient();
 
-  // Função para verificar se o slug é único
   const checkSlugUnique = async (slug: string): Promise<boolean> => {
     const { data, error } = await supabase
       .from('projects')
@@ -52,7 +51,6 @@ export default function CreateProjectPage() {
       .eq('slug', slug)
       .single();
 
-    // Se não encontrou nenhum projeto com esse slug, está disponível
     return !data;
   };
 
@@ -63,7 +61,6 @@ export default function CreateProjectPage() {
     setLoading(true);
 
     try {
-      // Validações básicas
       if (!formData.title.trim()) {
         throw new Error('O título é obrigatório');
       }
@@ -76,19 +73,16 @@ export default function CreateProjectPage() {
         throw new Error('O slug é obrigatório');
       }
 
-      // Verificar se o slug é único
       const isSlugUnique = await checkSlugUnique(formData.slug);
       if (!isSlugUnique) {
         throw new Error('Este slug já está em uso. Escolha outro.');
       }
 
-      // Upload da imagem principal
       const mainImageUrl = await uploadImage(mainImage, 'projects/main');
       if (!mainImageUrl) {
         throw new Error('Erro ao fazer upload da imagem principal');
       }
 
-      // Determinar a próxima ordem disponível
       const { data: existingProjects } = await supabase
         .from('projects')
         .select('order_index')
@@ -99,7 +93,6 @@ export default function CreateProjectPage() {
         ? existingProjects[0].order_index + 1
         : 0;
 
-      // Inserir projeto no banco
       const { data: project, error: projectError } = await supabase
         .from('projects')
         .insert([
@@ -122,7 +115,6 @@ export default function CreateProjectPage() {
 
       if (projectError) throw projectError;
 
-      // Upload das imagens da galeria
       if (galleryImages.length > 0) {
         const galleryPromises = galleryImages.map(async (galleryImage, index) => {
           if (galleryImage.file) {
@@ -146,13 +138,9 @@ export default function CreateProjectPage() {
       }
 
       alert('Projeto criado com sucesso!');
-      // Use replace em vez de push para evitar histórico de navegação problemático
-      router.replace('/admin/projects');
-      // Aguarde um pouco antes do refresh para garantir a navegação
-      setTimeout(() => {
-        router.refresh();
-      }, 100);
-
+      // CORREÇÃO: Usar push em vez de replace e remover o refresh
+      router.push('/admin/projects');
+      
     } catch (err) {
       console.error('Erro ao criar projeto:', err);
       setError(err instanceof Error ? err.message : 'Erro ao criar projeto');

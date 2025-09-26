@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, ExternalLink, Github, Calendar, Tag, Code, Zap, Users } from 'lucide-react';
-import { Project } from '@/types/database';
+import { Project, ProjectImage } from '@/types/database';
 import { formatDate, cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/server';
 import ProjectImageGallery from '@/components/ui/ProjectImageGallery';
@@ -14,12 +14,16 @@ interface ProjectPageProps {
   };
 }
 
-// Função real para buscar projeto do Supabase
-async function getProject(slug: string): Promise<Project | null> {
+// Interface extendida para incluir images
+interface ProjectWithImages extends Project {
+  images: ProjectImage[];
+}
+
+// CORREÇÃO: Função para buscar projeto com garantia de imagens
+async function getProject(slug: string): Promise<ProjectWithImages | null> {
   const supabase = await createClient();
   
   try {
-    // Primeiro, busca o projeto principal
     const { data: project, error: projectError } = await supabase
       .from('projects')
       .select('*')
@@ -32,7 +36,6 @@ async function getProject(slug: string): Promise<Project | null> {
       return null;
     }
 
-    // Depois, busca as imagens separadamente
     const { data: images, error: imagesError } = await supabase
       .from('project_images')
       .select('*')
@@ -41,15 +44,30 @@ async function getProject(slug: string): Promise<Project | null> {
       .order('display_order', { ascending: true });
 
     if (imagesError) {
-      console.warn('Erro ao buscar imagens, usando apenas imagem principal:', imagesError);
-      // Não retorna null, apenas usa array vazio para imagens
+      console.warn('Erro ao buscar imagens adicionais:', imagesError);
     }
 
-    // Retorna o projeto com as imagens
+    // CORREÇÃO CRÍTICA: Sempre incluir a imagem principal + imagens adicionais
+    const allImages: ProjectImage[] = [
+      // Imagem principal sempre como primeira imagem
+      {
+        id: 'main-image',
+        image_url: project.image_url,
+        image_alt: `Imagem principal - ${project.title}`,
+        display_order: 0,
+        project_id: project.id,
+        is_active: true,
+        created_at: project.created_at
+      },
+      // Imagens adicionais
+      ...(images || [])
+    ];
+
+    // CORREÇÃO: Retornar o tipo correto garantindo que images existe
     return {
       ...project,
-      images: images || []
-    };
+      images: allImages
+    } as ProjectWithImages;
     
   } catch (error) {
     console.error('Erro inesperado ao carregar projeto:', error);
@@ -57,7 +75,6 @@ async function getProject(slug: string): Promise<Project | null> {
   }
 }
 
-// Função para buscar projetos relacionados
 async function getRelatedProjects(currentProjectId: string, limit: number = 3): Promise<Project[]> {
   const supabase = await createClient();
   
@@ -72,7 +89,6 @@ async function getRelatedProjects(currentProjectId: string, limit: number = 3): 
   return data || [];
 }
 
-// Generate metadata
 export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
   const { slug } = await params;
   const project = await getProject(slug);
@@ -94,7 +110,6 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
   };
 }
 
-// Generate viewport - CORREÇÃO CRÍTICA
 export async function generateViewport({ params }: ProjectPageProps): Promise<Viewport> {
   return {
     themeColor: '#3b82f6',
@@ -245,18 +260,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               </div>
             </div>
 
-            {/* Project Gallery */}
+            {/* Project Gallery - CORREÇÃO: Garantir que as imagens sejam passadas corretamente */}
             <div className="relative animate-fade-in lg:animate-slide-in-right">
               <ProjectImageGallery 
-                images={project.images || [{ 
-                  id: '1', 
-                  image_url: project.image_url, 
-                  image_alt: project.title,
-                  display_order: 0,
-                  project_id: project.id,
-                  is_active: true,
-                  created_at: project.created_at
-                }]} 
+                images={project.images} 
                 projectTitle={project.title}
               />
               
@@ -284,31 +291,29 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             </div>
             
             {project.full_description ? (
-              <div className="bg-black text-white rounded-2xl shadow-lg border border-neutral-200 p-8 md:p-12">
+              <div className="bg-white rounded-2xl shadow-lg border border-neutral-200 p-8 md:p-12">
                 <div 
                   className="prose prose-lg prose-neutral max-w-none 
-                           prose-headings:text-neutral-900 prose-headings:font-bold prose-headings:text-2xl
-                           prose-p:text-neutral-900 prose-p:leading-relaxed prose-p:text-lg prose-p:font-medium
-                           prose-a:text-blue-700 prose-a:hover:text-blue-800 prose-a:font-semibold prose-a:underline
-                           prose-strong:text-neutral-900 prose-strong:font-bold
-                           prose-ul:text-neutral-900 prose-li:text-neutral-900 prose-li:font-medium prose-li:text-lg
-                           prose-ol:text-neutral-900 prose-ol:font-medium
-                           prose-blockquote:text-neutral-800 prose-blockquote:border-l-blue-600 prose-blockquote:bg-blue-50 prose-blockquote:p-4 prose-blockquote:rounded-r
-                           prose-code:text-indigo-800 prose-code:bg-indigo-100 prose-code:px-3 prose-code:py-1 prose-code:rounded prose-code:font-semibold
-                           prose-pre:bg-neutral-900 prose-pre:text-white
-                           prose-hr:border-neutral-300"
+                           prose-headings:text-neutral-900 prose-headings:font-bold 
+                           prose-p:text-neutral-700 prose-p:leading-relaxed
+                           prose-a:text-blue-600 prose-a:hover:text-blue-700
+                           prose-strong:text-neutral-900
+                           prose-ul:text-neutral-700
+                           prose-li:text-neutral-700
+                           prose-blockquote:text-neutral-600 prose-blockquote:border-l-blue-500
+                           prose-code:text-blue-600 prose-code:bg-blue-50"
                   dangerouslySetInnerHTML={{ __html: project.full_description }}
                 />
               </div>
             ) : (
-              <div className="text-center py-16 bg-neutral-100 rounded-2xl border border-neutral-300">
+              <div className="text-center py-16 bg-neutral-100 rounded-2xl border border-neutral-200">
                 <div className="w-20 h-20 bg-neutral-300 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Code className="w-10 h-10 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-2">
+                <h3 className="text-xl font-semibold text-neutral-700 mb-2">
                   Descrição Detalhada
                 </h3>
-                <p className="text-white font-medium">
+                <p className="text-neutral-600 font-medium">
                   A descrição completa deste projeto será adicionada em breve...
                 </p>
               </div>

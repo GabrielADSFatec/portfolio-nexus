@@ -15,27 +15,24 @@ export default function ProjectImageGallery({ images, projectTitle }: ProjectIma
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Se não houver imagens, mostrar placeholder
-  const displayImages = images.length > 0 ? images : [
-    {
-      id: 'placeholder',
-      image_url: '/assets/placeholder.png',
-      image_alt: projectTitle,
-      display_order: 0,
-      project_id: '',
-      is_active: true,
-      created_at: ''
-    }
-  ];
+  // CORREÇÃO: Sempre incluir a imagem principal mesmo se não houver imagens adicionais
+  const displayImages = images.length > 0 ? images : [];
 
-  const currentImage = displayImages[currentImageIndex];
+  // Se não houver imagens, mostrar placeholder
+  const hasImages = displayImages.length > 0;
+
+  const currentImage = hasImages ? displayImages[currentImageIndex] : null;
 
   const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % displayImages.length);
+    if (hasImages) {
+      setCurrentImageIndex((prev) => (prev + 1) % displayImages.length);
+    }
   };
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + displayImages.length) % displayImages.length);
+    if (hasImages) {
+      setCurrentImageIndex((prev) => (prev - 1 + displayImages.length) % displayImages.length);
+    }
   };
 
   const openModal = () => {
@@ -46,6 +43,25 @@ export default function ProjectImageGallery({ images, projectTitle }: ProjectIma
     setIsModalOpen(false);
   };
 
+  // CORREÇÃO: Se não há imagens, mostrar mensagem
+  if (!hasImages) {
+    return (
+      <div className="relative aspect-video lg:aspect-square rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+        <div className="text-center p-8">
+          <div className="w-16 h-16 bg-gray-400 rounded-full flex items-center justify-center mx-auto mb-4">
+            <ZoomIn className="w-8 h-8 text-white" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">
+            Nenhuma imagem disponível
+          </h3>
+          <p className="text-gray-600">
+            Este projeto não possui imagens cadastradas.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       {/* Main Gallery */}
@@ -53,8 +69,8 @@ export default function ProjectImageGallery({ images, projectTitle }: ProjectIma
         {/* Main Image */}
         <div className="relative aspect-video lg:aspect-square rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-primary-100 to-secondary-100 group">
           <Image
-            src={currentImage.image_url}
-            alt={currentImage.image_alt || projectTitle}
+            src={currentImage!.image_url}
+            alt={currentImage!.image_alt || projectTitle}
             fill
             className="object-cover hover:scale-105 transition-transform duration-700"
             priority
@@ -125,20 +141,20 @@ export default function ProjectImageGallery({ images, projectTitle }: ProjectIma
       {/* Modal de Zoom */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
-          <div className="relative max-w-7xl max-h-full">
-            {/* Close button */}
+          <div className="relative max-w-7xl max-h-full w-full">
+            {/* Close button - CORREÇÃO: Posicionamento melhorado */}
             <button
               onClick={closeModal}
-              className="absolute -top-12 right-0 text-white hover:text-neutral-300 transition-colors"
+              className="absolute -top-12 right-0 text-white hover:text-neutral-300 transition-colors z-10 bg-black/50 rounded-full p-2"
             >
-              <X className="w-8 h-8" />
+              <X className="w-6 h-6" />
             </button>
 
-            {/* Modal Image */}
-            <div className="relative w-full h-full max-w-5xl max-h-[80vh]">
+            {/* Modal Image - CORREÇÃO: Melhor centralização */}
+            <div className="relative w-full h-full max-w-5xl max-h-[80vh] flex items-center justify-center mx-auto">
               <Image
-                src={currentImage.image_url}
-                alt={currentImage.image_alt || projectTitle}
+                src={currentImage!.image_url}
+                alt={currentImage!.image_alt || projectTitle}
                 width={1200}
                 height={800}
                 className="w-full h-full object-contain rounded-lg"
@@ -151,18 +167,18 @@ export default function ProjectImageGallery({ images, projectTitle }: ProjectIma
               <>
                 <button
                   onClick={prevImage}
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full backdrop-blur-sm transition-all"
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full backdrop-blur-sm transition-all z-10"
                 >
                   <ChevronLeft className="w-6 h-6" />
                 </button>
                 <button
                   onClick={nextImage}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full backdrop-blur-sm transition-all"
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full backdrop-blur-sm transition-all z-10"
                 >
                   <ChevronRight className="w-6 h-6" />
                 </button>
 
-                {/* Modal counter */}
+                {/* Modal counter - CORREÇÃO: Posicionamento melhorado */}
                 <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/60 text-white px-4 py-2 rounded-full">
                   {currentImageIndex + 1} de {displayImages.length}
                 </div>
