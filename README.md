@@ -16,14 +16,6 @@ Este projeto foi construído com as seguintes ferramentas:
 
 ---
 
-## 📸 Preview
-
-<p align="center">
-  <img src="https://portfolio-nexus-pi.vercel.app/" alt="Preview do projeto" width="800"/>
-</p>
-
----
-
 ## 📂 Estrutura de Pastas
 
 portfolio-nexus/
