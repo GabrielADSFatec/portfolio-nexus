@@ -19,7 +19,7 @@ Este projeto foi construído com as seguintes ferramentas:
 ## 📸 Preview
 
 <p align="center">
-  <img src="./public/preview.png" alt="Preview do projeto" width="800"/>
+  <img src="https://portfolio-nexus-pi.vercel.app/" alt="Preview do projeto" width="800"/>
 </p>
 
 ---
@@ -38,3 +38,8 @@ portfolio-nexus/
 │── tsconfig.json
 │── package.json
 │── README.md
+
+
+Testar localmente:
+
+bash: npm run dev
