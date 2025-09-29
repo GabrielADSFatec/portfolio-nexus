@@ -69,7 +69,14 @@ export default function Footer() {
                   <Icon className="w-5 h-5" />
                 </a>
               ))}
+              
             </div>
+            <Image
+                                            src="/fatec_itu.png"
+                                            alt="Logo da faculdade"
+                                            width={150}
+                                            height={150}
+                                          />
           </div>
 
           {/* Quick links */}
