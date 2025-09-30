@@ -1,20 +1,19 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
-import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
-import { CarouselItem } from '@/types/database';
-import { createClient } from '@/lib/supabase/client';
-import { cn } from '@/lib/utils';
+import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
+import { ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
+import { CarouselItem } from "@/types/database";
+import { createClient } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
 
-// Import Swiper
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Navigation, Pagination, EffectFade } from 'swiper/modules';
-import type { Swiper as SwiperType } from 'swiper';
-import 'swiper/css';
-import 'swiper/css/effect-fade';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Navigation, Pagination, EffectFade } from "swiper/modules";
+import type { Swiper as SwiperType } from "swiper";
+import "swiper/css";
+import "swiper/css/effect-fade";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 export default function HeroSection() {
   const [carouselItems, setCarouselItems] = useState<CarouselItem[]>([]);
@@ -22,7 +21,7 @@ export default function HeroSection() {
   const [error, setError] = useState<string | null>(null);
   const [windowWidth, setWindowWidth] = useState(0);
   const [activeIndex, setActiveIndex] = useState(0);
-  
+
   const swiperRef = useRef<SwiperType | null>(null);
   const supabase = createClient();
 
@@ -32,9 +31,9 @@ export default function HeroSection() {
     };
 
     setWindowWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
@@ -44,14 +43,14 @@ export default function HeroSection() {
 
       try {
         const { data, error: supabaseError } = await supabase
-          .from('carousel_items')
-          .select('*')
-          .eq('is_active', true)
-          .order('order_index', { ascending: true });
+          .from("carousel_items")
+          .select("*")
+          .eq("is_active", true)
+          .order("order_index", { ascending: true });
 
         if (supabaseError) {
-          console.error('Erro Supabase:', supabaseError);
-          setError('Erro ao conectar com o banco de dados');
+          console.error("Erro Supabase:", supabaseError);
+          setError("Erro ao conectar com o banco de dados");
           return;
         }
 
@@ -60,20 +59,21 @@ export default function HeroSection() {
         } else {
           setCarouselItems([
             {
-              id: 'default',
-              title: 'Desenvolvedor Full Stack',
-              description: 'Especializado em criar soluções web modernas e escaláveis',
-              image_url: '/images/placeholder.png',
+              id: "default",
+              title: "Desenvolvedor Full Stack",
+              description:
+                "Especializado em criar soluções web modernas e escaláveis",
+              image_url: "/images/placeholder.png",
               link_url: null,
               order_index: 0,
               is_active: true,
               created_at: new Date().toISOString(),
-            }
+            },
           ]);
         }
       } catch (err) {
-        console.error('Erro inesperado:', err);
-        setError('Erro inesperado ao carregar dados');
+        console.error("Erro inesperado:", err);
+        setError("Erro inesperado ao carregar dados");
       } finally {
         setIsLoading(false);
       }
@@ -111,7 +111,7 @@ export default function HeroSection() {
     );
   }
 
-  const buttonPosition = windowWidth < 768 ? 'top-2/3' : 'top-1/2';
+  const buttonPosition = windowWidth < 768 ? "top-2/3" : "top-1/2";
 
   return (
     <section className="relative h-screen overflow-hidden isolate carousel-container">
@@ -155,9 +155,9 @@ export default function HeroSection() {
                 className="object-cover"
                 priority={index === 0}
                 onError={(e) => {
-                  console.warn('Erro ao carregar imagem:', item.image_url);
+                  console.warn("Erro ao carregar imagem:", item.image_url);
                   const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
+                  target.style.display = "none";
                 }}
               />
               <div className="absolute inset-0 bg-gradient-to-r from-primary-900/80 via-primary-800/60 to-transparent" />
@@ -173,9 +173,11 @@ export default function HeroSection() {
                     </h1>
                     {item.description && (
                       <div className="relative mb-8 mt-4 md:mt-16 lg:mt-20">
-                        <p className="text-xl md:text-2xl text-white/95 leading-relaxed drop-shadow-lg 
+                        <p
+                          className="text-xl md:text-2xl text-white/95 leading-relaxed drop-shadow-lg 
                                     [text-shadow:_0_2px_8px_rgb(0_0_0_/_60%)] bg-black/40 backdrop-blur-sm 
-                                    rounded-lg p-4 border border-white/10 max-w-md mx-auto">
+                                    rounded-lg p-4 border border-white/10 max-w-md mx-auto"
+                        >
                           {item.description}
                         </p>
                       </div>
@@ -203,16 +205,24 @@ export default function HeroSection() {
         ))}
       </Swiper>
 
-      {/* Navigation Controls - Only show if multiple slides */}
+      {/* Navigation Controls - If multiple slides */}
       {carouselItems.length > 1 && (
         <>
           {/* Previous/Next Buttons */}
           <button
             onClick={prevSlide}
             className={cn(
-              "absolute left-2 z-20 p-2 rounded-full bg-black/40 backdrop-blur-md hover:bg-black/60 transition-all duration-200 text-white hover:scale-110 border border-white/20 shadow-lg md:left-4",
+              "rounded-md", // Formato retangular com bordas suaves
+              "left-0", // Cola no canto esquerdo
+              "md:left-1", // Mantém no canto esquerdo em telas maiores
+              "h-16", // Altura fixa para o retângulo
+              "w-6", // Largura menor para o retângulo
+              "flex", // Utilizado para centralizar o ícone
+              "items-center", // Centraliza verticalmente
+              "justify-center", // Centraliza horizontalmente
               buttonPosition,
-              "transform -translate-y-1/2"
+              "transform -translate-y-1/2",
+              "absolute z-20 p-2 bg-black/40 backdrop-blur-md hover:bg-black/60 transition-all duration-200 text-white hover:scale-110 border border-white/20 shadow-lg"
             )}
             aria-label="Slide anterior"
           >
@@ -222,9 +232,17 @@ export default function HeroSection() {
           <button
             onClick={nextSlide}
             className={cn(
-              "absolute right-2 z-20 p-2 rounded-full bg-black/40 backdrop-blur-md hover:bg-black/60 transition-all duration-200 text-white hover:scale-110 border border-white/20 shadow-lg md:right-4",
+              "rounded-md", // Formato retangular com bordas suaves
+              "right-0", // Cola no canto direito
+              "md:right-1", // Mantém no canto direito em telas maiores
+              "h-16", // Altura fixa para o retângulo
+              "w-6", // Largura menor para o retângulo
+              "flex", // Utilizado para centralizar o ícone
+              "items-center", // Centraliza verticalmente
+              "justify-center", // Centraliza horizontalmente
               buttonPosition,
-              "transform -translate-y-1/2"
+              "transform -translate-y-1/2",
+              "absolute z-20 p-2 bg-black/40 backdrop-blur-md hover:bg-black/60 transition-all duration-200 text-white hover:scale-110 border border-white/20 shadow-lg"
             )}
             aria-label="Próximo slide"
           >
@@ -238,10 +256,10 @@ export default function HeroSection() {
                 key={index}
                 onClick={() => goToSlide(index)}
                 className={cn(
-                  'w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 shadow-sm',
+                  "w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 shadow-sm",
                   index === activeIndex
-                    ? 'bg-white scale-125 shadow-white/50'
-                    : 'bg-white/60 hover:bg-white/80'
+                    ? "bg-white scale-125 shadow-white/50"
+                    : "bg-white/60 hover:bg-white/80"
                 )}
                 aria-label={`Ir para slide ${index + 1}`}
               />
@@ -250,11 +268,9 @@ export default function HeroSection() {
         </>
       )}
 
-      {/* Scroll Indicator */}
+      {/* Scroll Indicator - Seta para baixo */}
       <div className="absolute bottom-8 right-4 z-20 animate-bounce-gentle md:right-8">
-        <div className="w-5 h-8 border-2 border-white/60 rounded-full flex justify-center">
-          <div className="w-1 h-2 bg-white/60 rounded-full mt-2 animate-pulse"></div>
-        </div>
+        <ChevronDown className="w-6 h-6 text-white/60 animate-pulse" />
       </div>
     </section>
   );

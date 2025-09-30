@@ -1,12 +1,21 @@
-import { Metadata, Viewport } from 'next';
-import { notFound } from 'next/navigation';
-import Image from 'next/image';
-import Link from 'next/link';
-import { ArrowLeft, ExternalLink, Github, Calendar, Tag, Code, Zap, Users } from 'lucide-react';
-import { Project, ProjectImage } from '@/types/database';
-import { formatDate, cn } from '@/lib/utils';
-import { createClient } from '@/lib/supabase/server';
-import ProjectImageGallery from '@/components/ui/ProjectImageGallery';
+import { Metadata, Viewport } from "next";
+import { notFound } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import {
+  ArrowLeft,
+  ExternalLink,
+  Github,
+  Calendar,
+  Tag,
+  Code,
+  Zap,
+  Users,
+} from "lucide-react";
+import { Project, ProjectImage } from "@/types/database";
+import { formatDate, cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/server";
+import ProjectImageGallery from "@/components/ui/ProjectImageGallery";
 
 interface ProjectPageProps {
   params: {
@@ -22,80 +31,84 @@ interface ProjectWithImages extends Project {
 // CORREÇÃO: Função para buscar projeto com garantia de imagens
 async function getProject(slug: string): Promise<ProjectWithImages | null> {
   const supabase = await createClient();
-  
+
   try {
     const { data: project, error: projectError } = await supabase
-      .from('projects')
-      .select('*')
-      .eq('slug', slug)
-      .eq('is_active', true)
+      .from("projects")
+      .select("*")
+      .eq("slug", slug)
+      .eq("is_active", true)
       .single();
 
     if (projectError || !project) {
-      console.error('Erro ao buscar projeto:', projectError);
+      console.error("Erro ao buscar projeto:", projectError);
       return null;
     }
 
     const { data: images, error: imagesError } = await supabase
-      .from('project_images')
-      .select('*')
-      .eq('project_id', project.id)
-      .eq('is_active', true)
-      .order('display_order', { ascending: true });
+      .from("project_images")
+      .select("*")
+      .eq("project_id", project.id)
+      .eq("is_active", true)
+      .order("display_order", { ascending: true });
 
     if (imagesError) {
-      console.warn('Erro ao buscar imagens adicionais:', imagesError);
+      console.warn("Erro ao buscar imagens adicionais:", imagesError);
     }
 
     // CORREÇÃO CRÍTICA: Sempre incluir a imagem principal + imagens adicionais
     const allImages: ProjectImage[] = [
       // Imagem principal sempre como primeira imagem
       {
-        id: 'main-image',
+        id: "main-image",
         image_url: project.image_url,
         image_alt: `Imagem principal - ${project.title}`,
         display_order: 0,
         project_id: project.id,
         is_active: true,
-        created_at: project.created_at
+        created_at: project.created_at,
       },
       // Imagens adicionais
-      ...(images || [])
+      ...(images || []),
     ];
 
     // CORREÇÃO: Retornar o tipo correto garantindo que images existe
     return {
       ...project,
-      images: allImages
+      images: allImages,
     } as ProjectWithImages;
-    
   } catch (error) {
-    console.error('Erro inesperado ao carregar projeto:', error);
+    console.error("Erro inesperado ao carregar projeto:", error);
     return null;
   }
 }
 
-async function getRelatedProjects(currentProjectId: string, limit: number = 3): Promise<Project[]> {
+async function getRelatedProjects(
+  currentProjectId: string,
+  limit: number = 3
+): Promise<Project[]> {
   const supabase = await createClient();
-  
+
   const { data, error } = await supabase
-    .from('projects')
-    .select('*')
-    .neq('id', currentProjectId)
-    .eq('is_active', true)
-    .order('created_at', { ascending: false })
+    .from("projects")
+    .select("*")
+    .neq("id", currentProjectId)
+    .eq("is_active", true)
+    .order("created_at", { ascending: false })
     .limit(limit);
 
   return data || [];
 }
 
-export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: ProjectPageProps): Promise<Metadata> {
   const { slug } = await params;
   const project = await getProject(slug);
 
   if (!project) {
     return {
-      title: 'Projeto não encontrado',
+      title: "Projeto não encontrado",
     };
   }
 
@@ -110,10 +123,12 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
   };
 }
 
-export async function generateViewport({ params }: ProjectPageProps): Promise<Viewport> {
+export async function generateViewport({
+  params,
+}: ProjectPageProps): Promise<Viewport> {
   return {
-    themeColor: '#3b82f6',
-    width: 'device-width',
+    themeColor: "#3b82f6",
+    width: "device-width",
     initialScale: 1,
   };
 }
@@ -128,6 +143,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   const relatedProjects = await getRelatedProjects(project.id);
 
+  
+
   return (
     <main className="min-h-screen pt-20 bg-neutral-50">
       {/* Hero Section */}
@@ -135,21 +152,23 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         <div className="container">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-neutral-600 mb-8">
-            <Link 
+            <Link
               href="/"
               className="hover:text-neutral-800 transition-colors font-medium"
             >
               Início
             </Link>
             <span className="text-neutral-400">/</span>
-            <Link 
+            <Link
               href="/#projetos"
               className="hover:text-neutral-800 transition-colors font-medium"
             >
               Projetos
             </Link>
             <span className="text-neutral-400">/</span>
-            <span className="text-neutral-800 font-semibold">{project.title}</span>
+            <span className="text-neutral-800 font-semibold">
+              {project.title}
+            </span>
           </div>
 
           {/* Back button */}
@@ -188,20 +207,28 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                       <Calendar className="w-6 h-6 text-blue-700" />
                     </div>
                     <div>
-                      <div className="text-sm text-neutral-600 font-medium">Criado em</div>
-                      <div className="text-lg font-semibold text-neutral-900">{formatDate(project.created_at)}</div>
+                      <div className="text-sm text-neutral-600 font-medium">
+                        Criado em
+                      </div>
+                      <div className="text-lg font-semibold text-neutral-900">
+                        {formatDate(project.created_at)}
+                      </div>
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-neutral-200 hover:shadow-md transition-all">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
                       <Code className="w-6 h-6 text-emerald-700" />
                     </div>
                     <div>
-                      <div className="text-sm text-neutral-600 font-medium">Tecnologias</div>
-                      <div className="text-lg font-semibold text-neutral-900">{project.technologies.length} utilizadas</div>
+                      <div className="text-sm text-neutral-600 font-medium">
+                        Tecnologias
+                      </div>
+                      <div className="text-lg font-semibold text-neutral-900">
+                        {project.technologies.length} utilizadas
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -247,10 +274,14 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                       key={tech}
                       className={cn(
                         "px-4 py-2 rounded-lg font-semibold text-sm shadow-sm border transition-all hover:scale-105",
-                        index % 4 === 0 && "bg-blue-100 text-blue-800 border-blue-300 hover:bg-blue-200",
-                        index % 4 === 1 && "bg-emerald-100 text-emerald-800 border-emerald-300 hover:bg-emerald-200",
-                        index % 4 === 2 && "bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-200",
-                        index % 4 === 3 && "bg-purple-100 text-purple-800 border-purple-300 hover:bg-purple-200"
+                        index % 4 === 0 &&
+                          "bg-blue-100 text-blue-800 border-blue-300 hover:bg-blue-200",
+                        index % 4 === 1 &&
+                          "bg-emerald-100 text-emerald-800 border-emerald-300 hover:bg-emerald-200",
+                        index % 4 === 2 &&
+                          "bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-200",
+                        index % 4 === 3 &&
+                          "bg-purple-100 text-purple-800 border-purple-300 hover:bg-purple-200"
                       )}
                     >
                       {tech}
@@ -261,19 +292,21 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             </div>
 
             {/* Project Gallery - CORREÇÃO: Garantir que as imagens sejam passadas corretamente */}
-            <div className="relative animate-fade-in lg:animate-slide-in-right">
-              <ProjectImageGallery 
-                images={project.images} 
-                projectTitle={project.title}
-              />
-              
-              {/* Floating badge */}
-              <div className="absolute -bottom-4 -left-4 bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl p-4 shadow-lg text-white">
-                <div className="flex items-center gap-2 text-sm font-semibold">
-                  <Users className="w-4 h-4" />
-                  <span>Projeto Real</span>
+            <div className="animate-fade-in lg:animate-slide-in-right">
+              {/* Badge reposicionado - Agora acima da galeria */}
+              <div className="flex justify-start mb-6">
+                <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl px-6 py-3 shadow-lg text-white">
+                  <div className="flex items-center gap-2 text-sm font-semibold">
+                    <Users className="w-4 h-4" />
+                    <span>Fotos do Projeto</span>
+                  </div>
                 </div>
               </div>
+
+              <ProjectImageGallery
+                images={project.images}
+                projectTitle={project.title}
+              />
             </div>
           </div>
         </div>
@@ -289,10 +322,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               </h2>
               <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-indigo-600 mx-auto rounded-full"></div>
             </div>
-            
+
             {project.full_description ? (
               <div className="bg-white rounded-2xl shadow-lg border border-neutral-200 p-8 md:p-12">
-                <div 
+                <div
                   className="prose prose-lg prose-neutral max-w-none 
                            prose-headings:text-neutral-900 prose-headings:font-bold 
                            prose-p:text-neutral-700 prose-p:leading-relaxed
@@ -338,7 +371,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {relatedProjects.map((relatedProject, index) => (
-                <div 
+                <div
                   key={relatedProject.id}
                   className="group animate-fade-in hover:scale-105 transition-all duration-300"
                   style={{ animationDelay: `${index * 100}ms` }}
