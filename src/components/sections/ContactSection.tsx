@@ -142,7 +142,7 @@ export default function ContactSection() {
             Vamos <span className="text-primary-400">conversar</span>
           </h2>
           <p className="text-lg text-neutral-300 max-w-3xl mx-auto">
-            Tem um projeto? Me conte detalhes abaixo — respondo o mais rápido possível.
+            Tem um projeto? Nos conte detalhes abaixo — responderemos o mais rápido possível.
           </p>
         </div>
 
@@ -151,7 +151,7 @@ export default function ContactSection() {
             <div>
               <h3 className="text-2xl font-semibold mb-4">Contato</h3>
               <p className="text-neutral-400 mb-6">
-                Prefere outro canal? Use email ou telefone abaixo.
+                Escolha um canal ou use email ou telefone abaixo.
               </p>
             </div>
 

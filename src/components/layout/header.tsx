@@ -23,6 +23,9 @@ export default function Header() {
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
+  // Detecta se está na página de projeto individual
+  const isProjectPage = pathname.startsWith('/projeto/');
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -81,11 +84,14 @@ export default function Header() {
     setIsMobileMenuOpen(false);
   };
 
+  // Lógica simplificada: em páginas de projeto, sempre use cores escuras
+  const shouldUseDarkStyles = isProjectPage || isScrolled;
+
   return (
     <header
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-        isScrolled
+        shouldUseDarkStyles
           ? 'bg-white shadow-md border-b border-gray-200'
           : 'bg-transparent'
       )}
@@ -97,7 +103,7 @@ export default function Header() {
             href="/"
             className={cn(
               "flex items-center space-x-3 font-bold text-xl transition-colors",
-              isScrolled 
+              shouldUseDarkStyles 
                 ? "text-gray-800 hover:text-blue-600" 
                 : "text-white hover:text-gray-200"
             )}
@@ -105,7 +111,7 @@ export default function Header() {
           >
             <div className={cn(
               "w-9 h-9 bg-white rounded-lg flex items-center justify-center overflow-hidden border",
-              isScrolled 
+              shouldUseDarkStyles 
                 ? "border-gray-300" 
                 : "border-white"
             )}>
@@ -117,7 +123,7 @@ export default function Header() {
                 className="w-7 h-7 object-contain"
               />
             </div>
-            <span className={isScrolled ? "text-gray-800" : "text-white"}>
+            <span className={shouldUseDarkStyles ? "text-gray-800" : "text-white"}>
               {siteConfig.name}
             </span>
           </Link>
@@ -134,7 +140,7 @@ export default function Header() {
                   href={item.href}
                   className={cn(
                     'flex items-center space-x-2 px-4 py-2 text-sm font-medium transition-colors rounded-md',
-                    isScrolled 
+                    shouldUseDarkStyles 
                       ? isActive
                         ? 'bg-blue-600 text-white'
                         : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600' 
@@ -156,7 +162,7 @@ export default function Header() {
               ref={menuButtonRef}
               className={cn(
                 "p-2 rounded-md transition-colors",
-                isScrolled 
+                shouldUseDarkStyles 
                   ? "bg-gray-100 hover:bg-gray-200 text-gray-700" 
                   : "bg-white/20 hover:bg-white/30 text-white"
               )}

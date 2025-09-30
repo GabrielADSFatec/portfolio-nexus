@@ -71,6 +71,7 @@ export default function Footer() {
               ))}
               
             </div>
+            <span>.</span>
             <Image
                                             src="/fatec_itu.png"
                                             alt="Logo da faculdade"
@@ -138,15 +139,15 @@ export default function Footer() {
                 width={20}
                 height={20}
               />
-              <span>© {currentYear} Feito por {siteConfig.name}.</span>
-              <span>e Fatec Itu - Todos os direitos reservados</span>
+              <span>© {currentYear} Feito por {siteConfig.name} e Fatec Itu - Todos os direitos reservados</span>
+              <span></span>
             </div>
 
             <div className="flex items-center gap-6">
-              <Link href="/privacy" className="text-neutral-500 hover:text-white transition-colors">
+              <Link href="/" className="text-neutral-500 hover:text-white transition-colors">
                 Privacidade
               </Link>
-              <Link href="/terms" className="text-neutral-500 hover:text-white transition-colors">
+              <Link href="/" className="text-neutral-500 hover:text-white transition-colors">
                 Termos
               </Link>
               <span className="text-neutral-800">•</span>
