@@ -69,6 +69,29 @@ export default function AdminLayout({
     return () => subscription.unsubscribe();
   }, [supabase, router]);
 
+  // Bloqueia o scroll do body E do html quando o sidebar está aberto no mobile
+  useEffect(() => {
+    if (sidebarOpen) {
+      // Salva a posição atual do scroll
+      const scrollY = window.scrollY;
+      
+      // Aplica os estilos para bloquear o scroll
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+      
+      return () => {
+        // Remove os estilos e restaura a posição do scroll
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.overflow = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [sidebarOpen]);
+
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
@@ -107,7 +130,7 @@ export default function AdminLayout({
       )}>
         <div className="flex h-full flex-col">
           {/* Header do Sidebar */}
-          <div className="flex h-16 items-center justify-between px-6 border-b border-neutral-700">
+          <div className="flex h-16 items-center justify-between px-6 border-b border-neutral-700 flex-shrink-0">
             <Link
               href="/admin/dashboard"
               className="flex items-center space-x-3"
@@ -130,85 +153,91 @@ export default function AdminLayout({
             </button>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-            {adminNavigation.map((item) => {
-              const Icon = iconMap[item.icon as keyof typeof iconMap];
-              const isActive = pathname === item.href;
+          {/* Scrollable Content Area */}
+          <div className="flex-1 overflow-y-auto">
+            {/* Navigation */}
+            <nav className="px-4 py-6 space-y-1">
+              {adminNavigation.map((item) => {
+                const Icon = iconMap[item.icon as keyof typeof iconMap];
+                const isActive = pathname === item.href;
 
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    'flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors',
-                    isActive
-                      ? 'bg-primary-500/20 text-primary-300 border-r-2 border-primary-500'
-                      : 'text-neutral-300 hover:bg-neutral-700 hover:text-white'
-                  )}
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  <Icon className="w-5 h-5" />
-                  <div>
-                    <div>{item.name}</div>
-                    <div className="text-xs text-neutral-400 mt-0.5">
-                      {item.description}
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={cn(
+                      'flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors',
+                      isActive
+                        ? 'bg-primary-500/20 text-primary-300 border-r-2 border-primary-500'
+                        : 'text-neutral-300 hover:bg-neutral-700 hover:text-white'
+                    )}
+                    onClick={() => setSidebarOpen(false)}
+                  >
+                    <Icon className="w-5 h-5" />
+                    <div>
+                      <div>{item.name}</div>
+                      <div className="text-xs text-neutral-400 mt-0.5">
+                        {item.description}
+                      </div>
                     </div>
-                  </div>
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* Quick Actions */}
+            <div className="px-4 py-4 border-t border-neutral-700">
+              <div className="space-y-1">
+                <Link
+                  href="/"
+                  target="_blank"
+                  className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-300 rounded-lg hover:bg-neutral-700 transition-colors"
+                >
+                  <Home className="w-4 h-4" />
+                  Ver Site
                 </Link>
-              );
-            })}
-          </nav>
-
-          {/* Quick Actions */}
-          <div className="px-4 py-4 border-t border-neutral-700">
-            <div className="space-y-1">
-              <Link
-                href="/"
-                target="_blank"
-                className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-300 rounded-lg hover:bg-neutral-700 transition-colors"
-              >
-                <Home className="w-4 h-4" />
-                Ver Site
-              </Link>
-              
-              <Link
-                href="/admin/settings"
-                className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-300 rounded-lg hover:bg-neutral-700 transition-colors"
-              >
-                <Settings className="w-4 h-4" />
-                Configurações
-              </Link>
-            </div>
-          </div>
-
-          {/* User info & Logout */}
-          <div className="p-4 border-t border-neutral-700">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-primary-500/20 rounded-full flex items-center justify-center">
-                <span className="text-primary-300 font-medium text-sm">
-                  {user.email?.charAt(0).toUpperCase()}
-                </span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium text-neutral-100 truncate">
-                  {user.user_metadata?.full_name || 'Admin'}
-                </div>
-                <div className="text-xs text-neutral-400 truncate">
-                  {user.email}
-                </div>
+               { /*
+                <Link
+                  href="/admin/settings"
+                  className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-300 rounded-lg hover:bg-neutral-700 transition-colors"
+                >
+                  <Settings className="w-4 h-4" />
+                  Configurações
+                </Link>
+              */}
               </div>
             </div>
 
-            <button
-              onClick={handleLogout}
-              disabled={isLoggingOut}
-              className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-400 rounded-lg hover:bg-red-500/20 transition-colors disabled:opacity-50"
-            >
-              <LogOut className="w-4 h-4" />
-              {isLoggingOut ? 'Saindo...' : 'Sair'}
-            </button>
+            {/* User info & Logout */}
+            <div className="p-4 border-t border-neutral-700">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-primary-500/20 rounded-full flex items-center justify-center">
+                  <span className="text-primary-300 font-medium text-sm">
+                    {user.email?.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium text-neutral-100 truncate">
+                    {user.user_metadata?.full_name || 'Admin'}
+                  </div>
+                  <div className="text-xs text-neutral-400 truncate">
+                    {user.email}
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-400 rounded-lg hover:bg-red-500/20 transition-colors disabled:opacity-50"
+              >
+                <LogOut className="w-8 h-8" />
+                {isLoggingOut ? 'Saindo...' : 'Sair'}
+              </button>
+            </div>
           </div>
+
+
         </div>
       </aside>
 
