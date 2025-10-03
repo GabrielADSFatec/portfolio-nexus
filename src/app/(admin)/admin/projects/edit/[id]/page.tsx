@@ -54,6 +54,7 @@ export default function EditProjectPage() {
   const [mainImage, setMainImage] = useState<File | null>(null);
   const [mainImagePreview, setMainImagePreview] = useState<string>('');
   const [originalMainImage, setOriginalMainImage] = useState<string>('');
+  const [mainImageRemoved, setMainImageRemoved] = useState(false);
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [existingImages, setExistingImages] = useState<ProjectImage[]>([]);
 
@@ -160,6 +161,11 @@ export default function EditProjectPage() {
 
       if (!formData.slug.trim()) {
         throw new Error('O slug é obrigatório');
+      }
+
+      // Validação da imagem principal
+      if (mainImageRemoved && !mainImage) {
+        throw new Error('A imagem principal é obrigatória. Por favor, adicione uma nova imagem.');
       }
 
       const isSlugUnique = await checkSlugUnique(formData.slug);
@@ -361,13 +367,21 @@ export default function EditProjectPage() {
 
   const handleMainImageChange = (file: File | null) => {
     setMainImage(file);
+    
     if (file) {
+      // Nova imagem foi adicionada
       const preview = URL.createObjectURL(file);
       setMainImagePreview(preview);
+      setMainImageRemoved(false);
     } else {
-      setMainImagePreview(originalMainImage);
+      // Imagem foi removida
+      setMainImagePreview('');
+      setMainImageRemoved(true);
     }
   };
+
+  // Verifica se pode salvar
+  const canSave = formData.title && formData.slug && (!mainImageRemoved || mainImage);
 
   if (loading) {
     return (
@@ -473,16 +487,20 @@ export default function EditProjectPage() {
 
           {/* Seção: Imagem Principal */}
           <div className="bg-neutral-800/50 rounded-xl p-6 border border-neutral-700/50">
-            <h2 className="text-lg font-semibold text-white mb-6">Imagem Principal</h2>
+            <h2 className="text-lg font-semibold text-white mb-6">Imagem Principal *</h2>
             <ImageUploadWithPreview
               onImageChange={handleMainImageChange}
               previewUrl={mainImagePreview}
               aspectRatio="video"
               label="Imagem Principal"
+              required={true}
             />
-            <div className="text-xs text-neutral-500 mt-2">
-              Deixe em branco para manter a imagem atual
-            </div>
+            {mainImageRemoved && !mainImage && (
+              <div className="flex items-center gap-2 text-amber-400 text-sm mt-3 p-3 bg-amber-500/10 rounded-lg">
+                <AlertCircle className="w-4 h-4" />
+                Por favor, adicione uma nova imagem principal para poder salvar
+              </div>
+            )}
           </div>
 
           {/* Seção: Galeria de Imagens */}
@@ -602,10 +620,10 @@ export default function EditProjectPage() {
             </Link>
             <button
               type="submit"
-              disabled={saving || !formData.title || !formData.slug}
+              disabled={saving || !canSave}
               className={cn(
                 'flex items-center gap-2 px-6 py-3 bg-primary-500 text-white rounded-lg transition-colors',
-                (saving || !formData.title || !formData.slug)
+                (saving || !canSave)
                   ? 'opacity-50 cursor-not-allowed'
                   : 'hover:bg-primary-600'
               )}

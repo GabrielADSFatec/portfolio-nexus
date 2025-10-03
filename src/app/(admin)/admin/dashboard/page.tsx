@@ -163,7 +163,7 @@ export default function DashboardPage() {
           Dashboard Administrativo
         </h2>
         <p className="text-neutral-400">
-          Gerencie todo o conteúdo do seu portfólio em um só lugar
+          Gerencie todo o conteúdo do portfólio da NexusJr em um só lugar!
         </p>
       </div>
 
@@ -320,7 +320,7 @@ export default function DashboardPage() {
           </h3>
           
           <p className="text-primary-200 mb-6">
-            Seu portfólio está funcionando com dados reais do Supabase!
+            Portfólio funcionando com dados do Supabase!
           </p>
 
           <Link

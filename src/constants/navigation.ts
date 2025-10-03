@@ -71,7 +71,7 @@ export const socialLinks = [
   },
   {
     name: "LinkedIn",
-    href: "https://linkedin.com/in/seuusuario",
+    href: "https://linkedin.com/school/fatec-itu",
     icon: "Linkedin",
   },
   {

@@ -14,6 +14,7 @@ interface ImageUploadWithPreviewProps {
   allowedTypes?: string[];
   label?: string;
   required?: boolean;
+  canRemove?: boolean;
 }
 
 export default function ImageUploadWithPreview({
@@ -24,7 +25,8 @@ export default function ImageUploadWithPreview({
   maxSize = 3 * 1024 * 1024, // 3MB
   allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
   label = 'Imagem',
-  required = false
+  required = false,
+  canRemove = true
 }: ImageUploadWithPreviewProps) {
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string>('');
@@ -73,7 +75,8 @@ export default function ImageUploadWithPreview({
     }
   };
 
-  const removeImage = () => {
+  const removeImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
     onImageChange(null);
     setError('');
   };
@@ -120,13 +123,15 @@ export default function ImageUploadWithPreview({
               fill
               className="object-cover"
             />
-            <button
-              type="button"
-              onClick={removeImage}
-              className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            {canRemove && (
+              <button
+                type="button"
+                onClick={removeImage}
+                className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-10"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-full p-6 text-center">

@@ -15,7 +15,7 @@ export default function Footer() {
       title: 'GitHub',
     },
     {
-      href: 'https://linkedin.com/in/seuusuario',
+      href: 'https://linkedin.com/school/fatec-itu',
       Icon: Linkedin,
       title: 'LinkedIn',
     },
@@ -108,7 +108,7 @@ export default function Footer() {
                   className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2 group"
                 >
                   <Mail className="w-4 h-4 group-hover:text-primary-400" />
-                  contato@seusite.com
+                  empreendefatecej@gmail.com
                 </a>
               </li>
               <li>
