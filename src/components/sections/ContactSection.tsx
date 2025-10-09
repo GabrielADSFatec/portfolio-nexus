@@ -222,7 +222,7 @@ export default function ContactSection() {
               </div>
             </div>
 
-            <div className="bg-neutral-800 p-4 rounded-lg border border-neutral-700">
+            <div className="bg-neutral-800 p-4 rounded border border-neutral-700">
               <div className="flex items-center gap-3">
                 <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse" />
                 <div className="font-medium text-green-300">Disponível para projetos</div>
@@ -231,8 +231,8 @@ export default function ContactSection() {
             </div>
           </div>
 
-          <div className="bg-neutral-800 rounded-2xl p-8 border border-neutral-700">
-            <h3 className="text-2xl font-semibold mb-4">Envie uma mensagem</h3>
+          <div className="bg-neutral-800 rounded p-5 border border-neutral-700">
+            <h3 className="text-2xl font-semibold mb-4">Envie uma mensagem!</h3>
 
             {submitStatus === 'success' && (
               <div className="mb-4 p-3 bg-green-900/40 border border-green-700 rounded flex items-center gap-3">
@@ -248,7 +248,9 @@ export default function ContactSection() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+
+            <div className="px-0">
+            <form onSubmit={handleSubmit} className="space-y-4 -mx-0 -my-0">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium mb-1">Nome *</label>
                 <input
@@ -257,7 +259,7 @@ export default function ContactSection() {
                   value={formData.name}
                   onChange={handleChange}
                   className={cn(
-                    'w-full rounded-md px-3 py-2 bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-500',
+                    'w-full rounded px-3 py-2 bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-500',
                     errors.name && 'border-red-500 focus:ring-red-400'
                   )}
                   placeholder="Seu nome completo"
@@ -275,10 +277,10 @@ export default function ContactSection() {
                   value={formData.email}
                   onChange={handleChange}
                   className={cn(
-                    'w-full rounded-md px-3 py-2 bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-500',
+                    'w-full rounded px-3 py-2 bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-500',
                     errors.email && 'border-red-500 focus:ring-red-400'
                   )}
-                  placeholder="seu@email.com"
+                  placeholder="seu@email.com.br"
                   disabled={isSubmitting}
                 />
                 {errors.email && <p className="text-sm text-red-400 mt-1">{errors.email}</p>}
@@ -293,7 +295,7 @@ export default function ContactSection() {
                   value={formData.message}
                   onChange={handleChange}
                   className={cn(
-                    'w-full rounded-md px-3 py-2 bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-500',
+                    'w-full rounded px-3 py-2 bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-500',
                     errors.message && 'border-red-500 focus:ring-red-400'
                   )}
                   placeholder="Como posso ajudar?"
@@ -322,6 +324,7 @@ export default function ContactSection() {
 
               <p className="text-sm text-neutral-500 text-center">* Campos obrigatórios</p>
             </form>
+            </div>
           </div>
         </div>
       </div>

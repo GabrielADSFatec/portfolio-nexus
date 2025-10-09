@@ -20,7 +20,7 @@ export default function Footer() {
       title: 'LinkedIn',
     },
     {
-      href: 'empreendefatecej@gmail.com',
+      href: 'mailto:empreendefatecej@gmail.com',
       Icon: Mail,
       title: 'Email',
     },
@@ -118,7 +118,7 @@ export default function Footer() {
                 Itu, SP - Brasil
               </li>
               <li>
-                <div className="flex items-center gap-2 bg-green-500/10 p-3 rounded-lg border border-green-500/20">
+                <div className="flex items-center gap-2 bg-green-500/10 p-3 rounded border border-green-500/20">
                   <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-500/50" />
                   <span className="text-green-400 text-sm font-medium">
                     Disponível para projetos
