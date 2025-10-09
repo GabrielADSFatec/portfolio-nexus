@@ -1,28 +1,33 @@
 // components/layout/footer.tsx
-import Link from 'next/link';
-import { Github, Linkedin, Mail, Heart } from 'lucide-react';
-import { siteConfig } from '@/constants';
-import { cn } from '@/lib/utils';
-import Image from 'next/image';
+"use client";
+
+import Link from "next/link";
+import { Github, Linkedin, Mail, Heart } from "lucide-react";
+import { siteConfig } from "@/constants/navigation";
+import { cn } from "@/lib/utils";
+import Image from "next/image";
+import useCompanyInfo from "@/hooks/useCompanyInfo";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const { companyInfo, isLoading, error } = useCompanyInfo();
 
+  // Links sociais dinâmicos - usando dados do Supabase
   const socialLinks = [
     {
-      href: 'https://github.com/FatecEJ',
+      href: companyInfo.github_url?.value || "https://github.com/FatecEJ",
       Icon: Github,
-      title: 'GitHub',
+      title: "GitHub",
     },
     {
-      href: 'https://linkedin.com/school/fatec-itu',
+      href: companyInfo.linkedin_url?.value || "https://linkedin.com/school/fatec-itu",
       Icon: Linkedin,
-      title: 'LinkedIn',
+      title: "LinkedIn",
     },
     {
-      href: 'mailto:empreendefatecej@gmail.com',
+      href: `mailto:${companyInfo.contact_email?.value || "empreendefatecej@gmail.com"}`,
       Icon: Mail,
-      title: 'Email',
+      title: "Email",
     },
   ];
 
@@ -40,14 +45,16 @@ export default function Footer() {
             >
               <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-xl shadow-primary-500/20 group-hover:shadow-primary-500/30 transition-all">
                 <Image
-                                            src="/logo-nexus.png"
-                                            alt="Logo da empresa"
-                                            width={50}
-                                            height={50}
-                                          />
+                  src="/logo-nexus.png"
+                  alt="Logo da empresa"
+                  width={50}
+                  height={50}
+                />
               </div>
               <div className="text-left">
-                <h3 className="text-xl font-bold text-white">{siteConfig.name}</h3>
+                <h3 className="text-xl font-bold text-white">
+                  {siteConfig.name}
+                </h3>
                 <p className="text-sm text-white">Escritório de projetos</p>
               </div>
             </Link>
@@ -69,22 +76,21 @@ export default function Footer() {
                   <Icon className="w-5 h-5" />
                 </a>
               ))}
-              
             </div>
             <span>.</span>
             <Image
-                                            src="/fatec_itu.png"
-                                            alt="Logo da faculdade"
-                                            width={150}
-                                            height={150}
-                                          />
+              src="/fatec_itu.png"
+              alt="Logo da faculdade"
+              width={150}
+              height={150}
+            />
           </div>
 
           {/* Quick links */}
           <div className="space-y-6">
             <h3 className="text-lg font-semibold text-white">Navegação</h3>
             <ul className="space-y-4">
-              {['inicio', 'projetos', 'clientes', 'contato'].map((link) => (
+              {["inicio", "projetos", "clientes", "contato"].map((link) => (
                 <li key={link}>
                   <Link
                     href={`/#${link}`}
@@ -104,18 +110,16 @@ export default function Footer() {
             <ul className="space-y-4">
               <li>
                 <a
-                  href="mailto:contato@seusite.com"
+                  href={`mailto:${companyInfo.contact_email?.value || "empreendefatecej@gmail.com"}`}
                   className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2 group"
                 >
                   <Mail className="w-4 h-4 group-hover:text-primary-400" />
-                  empreendefatecej@gmail.com
+                  {companyInfo.contact_email?.value || "empreendefatecej@gmail.com"}
                 </a>
-              </li>
-              <li>
               </li>
               <li className="text-neutral-400 flex items-center gap-2">
                 <span>📍</span>
-                Itu, SP - Brasil
+                {companyInfo.address?.value || "Itu, SP - Brasil"}
               </li>
               <li>
                 <div className="flex items-center gap-2 bg-green-500/10 p-3 rounded border border-green-500/20">
@@ -139,15 +143,24 @@ export default function Footer() {
                 width={20}
                 height={20}
               />
-              <span>© {currentYear} Feito por {siteConfig.name} e Fatec Itu - Todos os direitos reservados</span>
+              <span>
+                © {currentYear} Feito por {siteConfig.name} e Fatec Itu - Todos
+                os direitos reservados
+              </span>
               <span></span>
             </div>
 
             <div className="flex items-center gap-6">
-              <Link href="/" className="text-neutral-500 hover:text-white transition-colors">
+              <Link
+                href="/"
+                className="text-neutral-500 hover:text-white transition-colors"
+              >
                 Privacidade
               </Link>
-              <Link href="/" className="text-neutral-500 hover:text-white transition-colors">
+              <Link
+                href="/"
+                className="text-neutral-500 hover:text-white transition-colors"
+              >
                 Termos
               </Link>
               <span className="text-neutral-800">•</span>

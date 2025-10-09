@@ -68,16 +68,19 @@ export const socialLinks = [
     name: "GitHub",
     href: "https://github.com/FatecEJ",
     icon: "Github",
+    key: "github_url"
   },
   {
     name: "LinkedIn",
     href: "https://linkedin.com/school/fatec-itu",
     icon: "Linkedin",
+     key: "linkedin_url"
   },
   {
     name: "Email",
     href: "mailto:empreendefatecej@gmail.com",
     icon: "Mail",
+    key: "contact_email"
   },
 ] as const;
 

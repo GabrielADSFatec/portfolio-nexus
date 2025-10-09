@@ -21,6 +21,9 @@ const defaultSettings: Omit<CompanyInfo, 'id' | 'created_at' | 'updated_at'>[] =
   { key: 'company_address', label: 'Endereço', value: '', type: 'textarea', is_active: true, display_order: 4 },
   { key: 'company_website', label: 'Website', value: '', type: 'url', is_active: true, display_order: 5 },
   { key: 'company_description', label: 'Descrição', value: '', type: 'textarea', is_active: true, display_order: 6 },
+  { key: 'github_url', label: 'URL do GitHub', value: '', type: 'url', is_active: true, display_order: 7 },
+  { key: 'linkedin_url', label: 'URL do LinkedIn', value: '', type: 'url', is_active: true, display_order: 8 },
+  { key: 'contact_email', label: 'Email do escritorio', value: '', type: 'email', is_active: true, display_order: 9 },
 ];
 
 const getIconForKey = (key: string) => {
