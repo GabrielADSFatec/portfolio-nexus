@@ -138,9 +138,9 @@ export default function ProjectsSection() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {filteredProjects.map((project) => (
-              <div key={project.id} className="group">
+              <div key={project.id} className="group w-full lg:max-w-sm">
                 <div className="card-hover p-0 overflow-hidden h-full flex flex-col bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300">
                   {/* Imagem do projeto */}
                   <div className="relative aspect-video overflow-hidden">
@@ -246,7 +246,7 @@ export default function ProjectsSection() {
           </p>
           <Link
             href="#contato"
-            className="btn btn-primary btn-lg"
+            className="btn btn-primary btn-lg hover:text-black"
           >
             Entrar em Contato
           </Link>

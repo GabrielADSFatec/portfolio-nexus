@@ -165,18 +165,18 @@ export default function HeroSection() {
 
             {/* Content */}
             <div className="relative z-10 h-full flex items-center">
-              <div className="container">
+              <div className="container mx-auto px-8 md:px-16">
                 <div className="max-w-2xl mx-4 md:mx-auto">
                   <div className="animate-fade-in">
-                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-8 md:mb-12 drop-shadow-2xl [text-shadow:_0_4px_12px_rgb(0_0_0_/_80%)]">
+                    <h1 className="text-2xl md:text-6xl lg:text-7xl font-bold text-white mb-8 md:mb-12 drop-shadow-2xl [text-shadow:_0_4px_12px_rgb(0_0_0_/_80%)]">
                       {item.title}
                     </h1>
                     {item.description && (
-                      <div className="relative mb-8 mt-4 md:mt-16 lg:mt-20">
+                      <div className="md:absolute md:right-8 lg:right-16 md:top-[auto] md:w-[60%] md:max-w-none mb-8 mt-4 md:mt-0">
                         <p
                           className="text-xl md:text-2xl text-white/95 leading-relaxed drop-shadow-lg 
-                                    [text-shadow:_0_2px_8px_rgb(0_0_0_/_60%)] bg-black/40 backdrop-blur-sm 
-                                    rounded-lg p-4 border border-white/10 max-w-md mx-auto"
+            [text-shadow:_0_2px_8px_rgb(0_0_0_/_60%)] bg-black/40 backdrop-blur-sm 
+            rounded-lg p-4 border border-white/10 max-w-md mx-auto md:mx-0"
                         >
                           {item.description}
                         </p>
@@ -269,9 +269,14 @@ export default function HeroSection() {
       )}
 
       {/* Scroll Indicator - Seta para baixo */}
-      <div className="absolute bottom-8 right-4 z-20 animate-bounce-gentle md:right-8">
-        <ChevronDown className="w-6 h-6 text-white/60 animate-pulse" />
-      </div>
+      <a
+        href="#projetos"
+        className="absolute bottom-8 right-4 md:right-8 z-20 animate-bounce"
+      >
+        <div className="bg-white/20 backdrop-blur-md rounded-full p-2 border-2 border-white/40 shadow-lg hover:bg-white/30 transition-all cursor-pointer">
+          <ChevronDown className="w-7 h-7 md:w-10 md:h-10 text-white animate-pulse drop-shadow-lg" />
+        </div>
+      </a>
     </section>
   );
 }
