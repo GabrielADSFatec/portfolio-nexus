@@ -102,7 +102,7 @@ export default function Header() {
           <Link
             href="/"
             className={cn(
-              "flex items-center space-x-3 font-bold text-xl transition-colors",
+              "flex items-center space-x-2 font-bold text-xl transition-colors",
               shouldUseDarkStyles 
                 ? "text-gray-800 hover:text-blue-600" 
                 : "text-white hover:text-gray-200"
@@ -110,7 +110,7 @@ export default function Header() {
             onClick={() => setIsMobileMenuOpen(false)}
           >
             <div className={cn(
-              "w-9 h-9 bg-white rounded-lg flex items-center justify-center overflow-hidden border",
+              "w-9 h-9 bg-white rounded-lg flex items-center justify-center overflow-hidden",
               shouldUseDarkStyles 
                 ? "border-gray-300" 
                 : "border-white"
@@ -118,9 +118,9 @@ export default function Header() {
               <Image
                 src="/logo-nexus.png"
                 alt="Logo da empresa"
-                width={36}
-                height={36}
-                className="w-7 h-7 object-contain"
+                width={40}
+                height={40}
+                className="w-10 h-10 object-contain"
               />
             </div>
             <span className={shouldUseDarkStyles ? "text-gray-800" : "text-white"}>
@@ -223,7 +223,7 @@ export default function Header() {
       {/* Backdrop para mobile */}
       <div 
         className={cn(
-          "md:hidden fixed inset-0 bg-black/50 z-30 transition-opacity duration-300",
+          "md:hidden fixed top-16 left-0 right-0 bottom-0 bg-black/50 z-[35] transition-opacity duration-300",
           isMobileMenuOpen 
             ? "opacity-100" 
             : "opacity-0 pointer-events-none"
