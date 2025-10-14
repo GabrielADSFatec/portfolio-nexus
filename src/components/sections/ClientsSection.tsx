@@ -52,7 +52,7 @@ export default function ClientsSection() {
       <section className="py-20 bg-gradient-to-br from-gray-50 to-white">
         <div className="container">
           <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0468BF]"></div>
           </div>
         </div>
       </section>
@@ -64,12 +64,12 @@ export default function ClientsSection() {
       <div className="container">
         {/* Header da seção */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-full text-sm font-medium mb-4">
+          <div className="inline-flex items-center gap-2 bg-[#0468BF]/10 text-[#023373] px-4 py-2 rounded-full text-sm font-medium mb-4">
             <Trophy className="w-4 h-4" />
             Parcerias de Sucesso
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Clientes que <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Confiam</span>
+            Clientes que <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#023373] to-[#0468BF]">Confiam</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
             Colaboramos com empresas e pessoas visionárias que valorizam excelência, 
@@ -106,7 +106,7 @@ export default function ClientsSection() {
                   key={client.id}
                   className={cn(
                     'group relative bg-white rounded-2xl p-4 hover:shadow-xl transition-all duration-500 flex flex-col aspect-square',
-                    'border border-gray-100 hover:border-blue-100',
+                    'border border-gray-100 hover:border-[#0468BF]/30',
                     'animate-fade-in hover:scale-105'
                   )}
                   style={{ animationDelay: `${index * 100}ms` }}
@@ -137,9 +137,9 @@ export default function ClientsSection() {
                           />
                           
                           {/* Overlay e ícone de link */}
-                          <div className="absolute inset-0 bg-blue-600/0 group-hover/link:bg-blue-600/5 transition-all duration-300" />
+                          <div className="absolute inset-0 bg-[#0468BF]/0 group-hover/link:bg-[#0468BF]/5 transition-all duration-300" />
                           <div className="absolute top-2 right-2 opacity-0 group-hover/link:opacity-100 transition-all duration-300">
-                            <div className="bg-blue-600 text-white p-1.5 rounded-lg shadow-lg">
+                            <div className="bg-[#0468BF] text-white p-1.5 rounded-lg shadow-lg">
                               <ExternalLink className="w-3 h-3" />
                             </div>
                           </div>
@@ -192,34 +192,34 @@ export default function ClientsSection() {
             </div>
 
             {/* Estatísticas melhoradas */}
-            <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-700 rounded-2xl p-8 md:p-12 text-white shadow-xl mb-16">
+            <div className="bg-gradient-to-r from-[#023373] via-[#0468BF] to-[#023373] rounded-2xl p-8 md:p-12 text-white shadow-xl mb-16">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                 <div className="animate-fade-in" style={{ animationDelay: '200ms' }}>
                   <div className="flex items-center justify-center gap-3 mb-3">
-                    <Users className="w-8 h-8 text-blue-200" />
+                    <Users className="w-8 h-8 text-white/80" />
                     <div className="text-left">
                       <div className="text-3xl md:text-4xl font-bold">{clients.length}+</div>
-                      <div className="text-blue-200 text-sm font-medium">Clientes Satisfeitos</div>
+                      <div className="text-white/80 text-sm font-medium">Clientes Satisfeitos</div>
                     </div>
                   </div>
                 </div>
 
                 <div className="animate-fade-in" style={{ animationDelay: '400ms' }}>
                   <div className="flex items-center justify-center gap-3 mb-3">
-                    <Trophy className="w-8 h-8 text-purple-200" />
+                    <Trophy className="w-8 h-8 text-[#0468BF]/30" />
                     <div className="text-left">
                       <div className="text-3xl md:text-4xl font-bold">10+</div>
-                      <div className="text-purple-200 text-sm font-medium">Projetos Entregues</div>
+                      <div className="text-white/80 text-sm font-medium">Projetos Entregues</div>
                     </div>
                   </div>
                 </div>
 
                 <div className="animate-fade-in" style={{ animationDelay: '600ms' }}>
                   <div className="flex items-center justify-center gap-3 mb-3">
-                    <Star className="w-8 h-8 text-yellow-200" />
+                    <Star className="w-8 h-8 text-yellow-400" />
                     <div className="text-left">
                       <div className="text-3xl md:text-4xl font-bold">99%</div>
-                      <div className="text-yellow-200 text-sm font-medium">Taxa de Satisfação</div>
+                      <div className="text-white/80 text-sm font-medium">Taxa de Satisfação</div>
                     </div>
                   </div>
                 </div>
@@ -238,7 +238,7 @@ export default function ClientsSection() {
                   &quot;A dedicação em entender nossas necessidades e entregar resultados excepcionais 
                   fez toda diferença no sucesso dos nossos projetos.&quot;
                 </blockquote>
-                <div className="text-blue-600 font-semibold">
+                <div className="text-[#0468BF] font-semibold">
                   — Depoimento de Cliente Satisfeito
                 </div>
               </div>
@@ -248,7 +248,7 @@ export default function ClientsSection() {
 
         {/* Call to Action melhorado */}
         <div className="text-center">
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 border border-blue-100">
+          <div className="bg-gradient-to-r from-[#0468BF]/10 to-[#023373]/10 rounded-2xl p-8 border border-[#0468BF]/20">
             <h3 className="text-2xl font-bold text-gray-900 mb-3">
               Pronto para fazer parte desta lista?
             </h3>
@@ -257,7 +257,7 @@ export default function ClientsSection() {
             </p>
             <Link
               href="#contato"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-[#023373] to-[#0468BF] text-white px-8 py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105"
             >
               Iniciar Projeto
               <Trophy className="w-4 h-4" />

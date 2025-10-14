@@ -269,7 +269,7 @@ export default function ProjectsSection() {
           </p>
           <Link
             href="#contato"
-            className="btn btn-primary btn-lg hover:text-black"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-[#023373] to-[#0468BF] text-white px-8 py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105"
           >
             Entrar em Contato
           </Link>
