@@ -78,12 +78,17 @@ export default function Footer() {
               ))}
             </div>
             <span>.</span>
-            <Image
-              src="/fatec_itu.png"
-              alt="Logo da faculdade"
-              width={150}
-              height={150}
-            />
+            <Link
+              href="https://fatecitu.cps.sp.gov.br/"
+              target="_blank"
+            >
+              <Image
+                src="/fatec_itu.png"
+                alt="Logo da faculdade"
+                width={150}
+                height={150}
+              />
+            </Link>
           </div>
 
           {/* Quick links */}
@@ -144,8 +149,15 @@ export default function Footer() {
                 height={20}
               />
               <span>
-                © {currentYear} Feito por {siteConfig.name} e Fatec Itu - Todos
-                os direitos reservados
+                © {currentYear} Feito por {siteConfig.name} e{" "}
+                <Link
+                  href="https://fatecitu.cps.sp.gov.br"
+                  target="_blank"
+                  className="hover:text-blue-500 transition-colors duration-200"
+                >
+                  Fatec Itu{" "}
+                </Link>
+                - Todos os direitos reservados
               </span>
               <span></span>
             </div>

@@ -206,7 +206,7 @@ export default function ClientsSection() {
 
                 <div className="animate-fade-in" style={{ animationDelay: '400ms' }}>
                   <div className="flex items-center justify-center gap-3 mb-3">
-                    <Trophy className="w-8 h-8 text-[#0468BF]/30" />
+                    <Trophy className="w-8 h-8 text-yellow-400" />
                     <div className="text-left">
                       <div className="text-3xl md:text-4xl font-bold">10+</div>
                       <div className="text-white/80 text-sm font-medium">Projetos Entregues</div>
