@@ -114,13 +114,13 @@ export default function ClientsSection() {
                   {/* Card Content */}
                   <div className="flex-1 flex flex-col">
                     {/* Image Container - Mais espaço para a imagem */}
-                    <div className="relative flex-1 mb-3 rounded-xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
+                    <div className="relative flex-1 mb-3 bg-gradient-to-br from-gray-50 to-gray-100">
                       {client.website_url ? (
                         <a
                           href={client.website_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="relative w-full h-full flex items-center justify-center group/link"
+                          className="relative w-full h-full flex items-center justify-center group/link rounded-xl overflow-hidden"
                           title={`Visitar ${client.name}`}
                         >
                           <Image
@@ -145,7 +145,7 @@ export default function ClientsSection() {
                           </div>
                         </a>
                       ) : (
-                        <div className="relative w-full h-full flex items-center justify-center">
+                        <div className="relative w-full h-full flex items-center justify-center rounded-xl overflow-hidden">
                           <Image
                             src={client.logo_url || '/images/placeholder.png'}
                             alt={`Logo ${client.name}`}

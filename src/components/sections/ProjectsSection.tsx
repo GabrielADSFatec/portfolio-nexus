@@ -13,7 +13,7 @@ export default function ProjectsSection() {
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "featured">("all");
   const [error, setError] = useState<string | null>(null);
-  const [visibleCount, setVisibleCount] = useState(8);
+  const [visibleCount, setVisibleCount] = useState(4);
 
   const supabase = createClient();
 
@@ -56,6 +56,23 @@ export default function ProjectsSection() {
 
     loadProjectsData();
   }, [supabase, filter]);
+
+  useEffect(() => {
+  // Função que verifica se é desktop (md = 768px no Tailwind)
+  const checkIfDesktop = () => {
+    const isDesktop = window.innerWidth >= 768;
+    setVisibleCount(isDesktop ? 8 : 4);
+  };
+
+  // Executar no mount
+  checkIfDesktop();
+
+  // Listener para redimensionamento
+  window.addEventListener('resize', checkIfDesktop);
+
+  // Cleanup
+  return () => window.removeEventListener('resize', checkIfDesktop);
+}, []);
 
   const filteredProjects =
     filter === "featured"
