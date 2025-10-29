@@ -42,8 +42,9 @@ const extractFilePathFromUrl = (url: string): string | null => {
     const urlObj = new URL(url);
     const pathParts = urlObj.pathname.split("/");
     const publicIndex = pathParts.indexOf("public");
-    if (publicIndex !== -1) {
-      return pathParts.slice(publicIndex + 1).join("/");
+    if (publicIndex !== -1 && pathParts.length > publicIndex + 2) {
+      // Pula "public" e o nome do bucket (portfolio-images)
+      return pathParts.slice(publicIndex + 2).join("/");
     }
     return null;
   } catch {
