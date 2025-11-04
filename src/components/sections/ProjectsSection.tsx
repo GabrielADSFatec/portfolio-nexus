@@ -60,27 +60,31 @@ export default function ProjectsSection() {
   }, [supabase, filter]);
 
   useEffect(() => {
-    // Função que verifica se é desktop (md = 768px no Tailwind)
-    const checkIfDesktop = () => {
-      const isDesktop = window.innerWidth >= 768;
-      const newInitialCount = isDesktop ? 8 : 4;
-      setInitialCount(newInitialCount);
+  let timeoutId: NodeJS.Timeout;
+  
+  const checkIfDesktop = () => {
+    const isDesktop = window.innerWidth >= 768;
+    const newInitialCount = isDesktop ? 8 : 4;
+    setInitialCount(newInitialCount);
+    
+    if (!userHasExpanded) {
+      setVisibleCount(newInitialCount);
+    }
+  };
 
-      // Só reseta se o usuário NÃO expandiu manualmente
-      if (!userHasExpanded) {
-        setVisibleCount(newInitialCount);
-      }
-    };
+  const debouncedCheck = () => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(checkIfDesktop, 500); // 500ms de delay
+  };
 
-    // Executar no mount
-    checkIfDesktop();
+  checkIfDesktop(); // Executar no mount
+  window.addEventListener('resize', debouncedCheck);
 
-    // Listener para redimensionamento
-    window.addEventListener('resize', checkIfDesktop);
-
-    // Cleanup
-    return () => window.removeEventListener('resize', checkIfDesktop);
-  }, []);
+  return () => {
+    clearTimeout(timeoutId);
+    window.removeEventListener('resize', debouncedCheck);
+  };
+}, [userHasExpanded]);
 
   const filteredProjects =
     filter === "featured"
