@@ -15,6 +15,7 @@ export default function ProjectsSection() {
   const [error, setError] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState(4);
   const [initialCount, setInitialCount] = useState(4);
+  const [userHasExpanded, setUserHasExpanded] = useState(false);
 
   const supabase = createClient();
 
@@ -62,8 +63,13 @@ export default function ProjectsSection() {
     // Função que verifica se é desktop (md = 768px no Tailwind)
     const checkIfDesktop = () => {
       const isDesktop = window.innerWidth >= 768;
-      setInitialCount(isDesktop ? 8 : 4);
-      setVisibleCount(isDesktop ? 8 : 4);
+      const newInitialCount = isDesktop ? 8 : 4;
+      setInitialCount(newInitialCount);
+
+      // Só reseta se o usuário NÃO expandiu manualmente
+      if (!userHasExpanded) {
+        setVisibleCount(newInitialCount);
+      }
     };
 
     // Executar no mount
@@ -272,7 +278,10 @@ export default function ProjectsSection() {
         {hasMore && (
           <div className="text-center mt-12">
             <button
-              onClick={() => setVisibleCount((prev) => prev + initialCount)}
+              onClick={() => {
+                setUserHasExpanded(true);
+                setVisibleCount((prev) => prev + initialCount);
+              }}
               className="inline-flex items-center gap-2 px-6 py-3 bg-neutral-800 text-white rounded-lg font-medium hover:bg-neutral-700 transition-all duration-200 shadow-md hover:shadow-lg"
             >
               <span className="text-2xl">+</span>
